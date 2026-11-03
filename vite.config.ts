@@ -8,10 +8,11 @@ export default defineConfig({
   base: './',
   build: {
     rollupOptions: {
-      // Deux pages : Falcon 9 (index.html) et Starship (starship.html).
+      // Trois pages : Falcon 9 (index.html), Starship (starship.html) et les planètes (planetes.html).
       input: {
         falcon9: 'index.html',
         starship: 'starship.html',
+        planetes: 'planetes.html',
       },
       output: {
         manualChunks: {

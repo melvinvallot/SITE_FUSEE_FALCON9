@@ -106,9 +106,10 @@ describe('Hero', () => {
 });
 
 describe('SiteNav', () => {
-  it('relie les deux pages et marque la page courante', () => {
+  it('relie les trois pages et marque la page courante', () => {
     render(<SiteNav current="starship" />);
     expect(screen.getByRole('link', { name: 'Starship' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Falcon 9' })).toHaveAttribute('href', './');
+    expect(screen.getByRole('link', { name: 'Planètes' })).toHaveAttribute('href', './planetes.html');
   });
 });
