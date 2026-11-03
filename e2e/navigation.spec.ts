@@ -4,6 +4,7 @@ import { test, expect } from './fixtures';
 const PAGES = [
   { path: './', name: 'Falcon 9', title: /Falcon 9/i },
   { path: './starship.html?auto=0', name: 'Starship', title: /Starship/i },
+  { path: './planetes.html', name: 'Planètes', title: /planètes/i },
 ];
 
 for (const p of PAGES) {
@@ -12,12 +13,12 @@ for (const p of PAGES) {
     await expect(page).toHaveTitle(p.title);
     const nav = page.getByRole('navigation', { name: 'Fusées' });
     await expect(nav).toBeVisible();
-    await expect(nav.getByRole('link')).toHaveText(['Falcon 9', 'Starship']);
+    await expect(nav.getByRole('link')).toHaveText(['Falcon 9', 'Starship', 'Planètes']);
     await expect(nav.getByRole('link', { name: p.name })).toHaveAttribute('aria-current', 'page');
   });
 }
 
-test('le menu permet de passer de Falcon 9 à Starship et inversement', async ({ page }) => {
+test('le menu permet de passer d’une page à l’autre', async ({ page }) => {
   await page.goto('./');
   const nav = page.getByRole('navigation', { name: 'Fusées' });
   await nav.getByRole('link', { name: 'Starship' }).click();
@@ -27,4 +28,8 @@ test('le menu permet de passer de Falcon 9 à Starship et inversement', async ({
   await page.getByRole('navigation', { name: 'Fusées' }).getByRole('link', { name: 'Falcon 9' }).click();
   await expect(page).not.toHaveURL(/starship\.html/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/falcon 9/i);
+
+  await page.getByRole('navigation', { name: 'Fusées' }).getByRole('link', { name: 'Planètes' }).click();
+  await expect(page).toHaveURL(/planetes\.html/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Combien de temps/);
 });

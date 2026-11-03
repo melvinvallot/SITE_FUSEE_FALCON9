@@ -49,17 +49,19 @@ La première fois, installez le navigateur des tests : `yarn playwright install 
 
 `yarn test:e2e` construit le site, le sert sur http://localhost:4173 puis vérifie (dossier `e2e/`) :
 
-- le menu commun (lien de la page en cours, passage d'une page à l'autre) ;
+- le menu commun (lien de la page en cours, passage d'une page à l'autre entre les trois pages) ;
 - chaque section de chaque page (présente, avec son titre, et active quand on y défile) ;
 - les boutons : « Démonter le lanceur », échelle de hauteur de Falcon 9, jauge et chapitres de
   Starship, « Revenir au début », liens de fin de page ;
 - sur Starship : flèches du clavier, bouton du son, mode vidéo (bouton et démarrage seul après 10 s),
   séquence de lancement avec compte à rebours, touche Échap ;
+- sur Planètes : la liste des destinations, la fiche de chaque planète (et l'adresse qui suit),
+  « Rejouer le voyage », « Aller à l'arrivée », fermeture de la fiche, encadré « Comment on calcule ? » ;
 - que la scène 3D n'est pas noire, qu'il n'y a aucune erreur dans la console, et que les pages
   tiennent dans la largeur d'un téléphone.
 
-Les listes de sections viennent de `src/data/` et `src/starship/data/` : un nouvel écran est testé
-automatiquement. Sans carte graphique (serveur), la 3D est lente : compter une dizaine de minutes.
+Les listes de sections et de planètes viennent des dossiers `data/` du code : un nouvel écran est testé
+automatiquement. Sans carte graphique (serveur), la 3D est lente : compter un quart d'heure.
 Les tests tournent aussi sur GitHub à chaque pull request (`.github/workflows/tests.yml`).
 
 Si `yarn` n'est pas installé : `npm install -g yarn`.
