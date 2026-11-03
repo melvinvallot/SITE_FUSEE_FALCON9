@@ -1,7 +1,7 @@
 import { BOOSTER_PIVOT, CATCH_BASE, LAUNCH_ALTITUDE, toWorld } from '../data/layout';
 import type { Keyframe, Scalars } from '../types';
 import { SCALAR_KEYS } from '../types';
-import { armsClosure, boosterPose, boosterThrust, bump, ignition, IGNITION_SHARE, launchLift, shipLift, shipThrust } from './flight';
+import { stage, armsClosure, boosterPose, boosterThrust, bump, ignition, IGNITION_SHARE, launchLift, shipLift, shipThrust } from './flight';
 import { easeOutCubic, formatNumber } from './format';
 import { sectionProgress } from './sectionProgress';
 import { formatMissionTime, readTelemetry, type TelemetryPoint } from './telemetry';
@@ -148,5 +148,19 @@ describe('repère du lanceur', () => {
     const [x, y, z] = toWorld([3, 7, 4]);
     expect(y).toBe(7);
     expect(Math.hypot(x, z)).toBeCloseTo(5);
+  });
+});
+
+describe('séparation en altitude', () => {
+  it('garde les étages assemblés pendant la première moitié de la montée', () => {
+    expect(stage(0.5)).toBe(0);
+    expect(stage(1)).toBe(1);
+    expect(shipLift(0.8, 0.5, 0)).toBe(launchLift(0.8));
+    expect(boosterThrust(0.8, 0.5, 0)).toBe(1);
+  });
+
+  it('sépare les étages bien au-dessus de la tour (plus de 100 m)', () => {
+    // Début de la séparation : la fusée a parcouru l'essentiel de sa montée.
+    expect(launchLift(0.83)).toBeGreaterThan(80);
   });
 });
