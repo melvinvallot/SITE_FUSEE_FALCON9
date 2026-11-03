@@ -1,0 +1,449 @@
+:root {
+  --night: #0e1a2b;
+  --night-deep: #08111d;
+  --frost: #cfe3f0;
+  --steel: #8c99a6;
+  --hull: #f2f4f5;
+  --merlin: #ffb347;
+
+  --font-display: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --font-body: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.375rem;
+  --step-3: clamp(2.5rem, 5vw, 4rem);
+  --step-hero: clamp(5rem, 13vw, 12rem);
+
+  --rail: 7.5rem;
+  color-scheme: dark;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+  background: var(--night-deep);
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background: radial-gradient(120% 90% at 70% 10%, #1a2c45 0%, var(--night) 45%, var(--night-deep) 100%) fixed;
+  color: var(--frost);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Scène 3D ---------- */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---------- Mise en page ---------- */
+.page {
+  position: relative;
+  z-index: 1;
+}
+
+.section {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 6rem clamp(1.25rem, 5vw, 5rem) 6rem calc(var(--rail) + clamp(1rem, 3vw, 3rem));
+}
+
+.section--end {
+  justify-content: flex-end;
+}
+
+.section__body {
+  min-width: 0;
+  max-width: 32rem;
+  transition: opacity 0.6s ease;
+  opacity: 0.28;
+  text-shadow: 0 1px 18px rgba(8, 17, 29, 0.9);
+}
+
+.section[data-active='true'] .section__body {
+  opacity: 1;
+}
+
+/* ---------- Accueil ---------- */
+.hero__title {
+  margin: 0 0 1.5rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--step-hero);
+  line-height: 0.82;
+  letter-spacing: -0.01em;
+  color: var(--hull);
+  display: flex;
+}
+
+.hero__title span {
+  display: inline-block;
+  animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(0.35em);
+    opacity: 0;
+  }
+}
+
+.hero__lead {
+  max-width: 26rem;
+  margin: 0 0 2rem;
+  font-size: var(--step-1);
+  line-height: 1.45;
+}
+
+/* ---------- Blocs de texte ---------- */
+.text-block__title,
+.part__name {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-3);
+  line-height: 0.95;
+  color: var(--hull);
+}
+
+.text-block__lead,
+.part__summary {
+  margin: 0 0 2rem;
+}
+
+.part__altitude {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--step-1);
+  color: var(--merlin);
+}
+
+/* ---------- Caractéristiques ---------- */
+.specs {
+  margin: 0 0 2rem;
+  display: grid;
+  gap: 0;
+  border-top: 1px solid rgba(207, 227, 240, 0.18);
+}
+
+.specs__row {
+  display: grid;
+  grid-template-columns: minmax(9rem, 1fr) 1.4fr;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(207, 227, 240, 0.18);
+}
+
+.specs dt {
+  color: var(--steel);
+  font-size: var(--step--1);
+}
+
+.specs dd {
+  margin: 0;
+  color: var(--hull);
+  font-weight: 500;
+}
+
+.specs--figures {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 0;
+  gap: 1.5rem 2rem;
+}
+
+.specs--figures .specs__row {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border: 0;
+  padding: 0;
+}
+
+.specs--figures dd {
+  order: -1;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 2.75rem;
+  line-height: 1;
+}
+
+.fineprint {
+  margin: 2.5rem 0 0;
+  font-size: var(--step--1);
+  color: var(--steel);
+}
+
+/* ---------- Boutons ---------- */
+.button {
+  font: 500 var(--step-0) / 1 var(--font-body);
+  padding: 0.9rem 1.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.button--primary {
+  background: var(--merlin);
+  color: var(--night-deep);
+  border: 1px solid var(--merlin);
+}
+
+.button--primary:hover {
+  background: #ffc773;
+}
+
+.button--quiet {
+  background: transparent;
+  color: var(--hull);
+  border: 1px solid rgba(207, 227, 240, 0.4);
+}
+
+.button--quiet:hover {
+  border-color: var(--hull);
+}
+
+:focus-visible {
+  outline: 2px solid var(--merlin);
+  outline-offset: 3px;
+}
+
+/* ---------- Altimètre ---------- */
+.altimeter {
+  position: fixed;
+  z-index: 2;
+  left: clamp(1rem, 2vw, 2rem);
+  top: 50%;
+  transform: translateY(-50%);
+  height: min(70vh, 34rem);
+  width: 5rem;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.altimeter__scale {
+  position: relative;
+  width: 2.1rem;
+  height: 100%;
+  border-right: 1px solid rgba(207, 227, 240, 0.25);
+}
+
+.altimeter__tick {
+  position: absolute;
+  right: 0.35rem;
+  transform: translateY(50%);
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--steel);
+  white-space: nowrap;
+}
+
+.altimeter__track {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 2.4rem;
+}
+
+.altimeter__item {
+  position: absolute;
+  left: 0;
+  width: 0.9rem;
+}
+
+.altimeter__item[data-lane='1'] {
+  left: 1.2rem;
+}
+
+.altimeter__band {
+  position: absolute;
+  inset: 1px 0;
+  width: 100%;
+  padding: 0;
+  border: 1px solid rgba(207, 227, 240, 0.35);
+  border-radius: 2px;
+  background: rgba(207, 227, 240, 0.06);
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.altimeter__band:hover,
+.altimeter__band[aria-current='true'] {
+  background: var(--merlin);
+  border-color: var(--merlin);
+}
+
+.altimeter__label {
+  position: absolute;
+  left: calc(100% + 0.6rem);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--hull);
+  padding: 0.1rem 0.5rem;
+  border-radius: 3px;
+  background: rgba(8, 17, 29, 0.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.altimeter__band:hover .altimeter__label,
+.altimeter__band:focus-visible .altimeter__label {
+  opacity: 1;
+}
+
+/* ---------- Barre de progression (mobile) ---------- */
+.progress {
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(3px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  display: none;
+}
+
+.progress__fill {
+  height: 3px;
+  background: var(--merlin);
+  transform-origin: left;
+}
+
+/* ---------- Barre de navigation commune ---------- */
+.site-nav {
+  position: fixed;
+  z-index: 4;
+  inset: 0 0 auto;
+  height: 3.5rem;
+  padding: env(safe-area-inset-top, 0px) clamp(1rem, 2.5vw, 2rem) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(8, 17, 29, 0.85), rgba(8, 17, 29, 0));
+}
+
+.site-nav__brand {
+  font: 600 1.125rem / 1 var(--font-display);
+  color: var(--hull);
+}
+
+.site-nav__list {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  border: 1px solid rgba(207, 227, 240, 0.18);
+  border-radius: 999px;
+  background: rgba(8, 17, 29, 0.6);
+}
+
+.site-nav__link {
+  display: block;
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  color: var(--frost);
+  font-size: var(--step--1);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.site-nav__link[aria-current='page'] {
+  background: var(--hull);
+  color: var(--night-deep);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+a.button {
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* ---------- Écrans étroits ---------- */
+@media (max-width: 760px) {
+  :root {
+    --rail: 0rem;
+  }
+
+  .altimeter {
+    display: none;
+  }
+
+  .progress {
+    display: block;
+  }
+
+  .section,
+  .section--end {
+    justify-content: flex-start;
+    align-items: flex-end;
+    padding: 5rem 1.25rem 3rem;
+  }
+
+  .section__body {
+    padding: 1.25rem;
+    margin: 0 -1.25rem;
+    background: linear-gradient(to top, rgba(8, 17, 29, 0.92) 70%, rgba(8, 17, 29, 0));
+  }
+
+  .hero__title {
+    font-size: clamp(3.5rem, 21vw, 7rem);
+  }
+
+  .part__summary,
+  .text-block__lead {
+    font-size: 0.9375rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .specs__row {
+    padding: 0.45rem 0;
+  }
+
+  .specs__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__title span {
+    animation: none;
+  }
+
+  .section__body,
+  .altimeter__band,
+  .altimeter__label,
+  .button {
+    transition: none;
+  }
+}
