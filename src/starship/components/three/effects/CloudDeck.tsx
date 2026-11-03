@@ -2,11 +2,11 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { DoubleSide, ShaderMaterial, type Mesh } from 'three';
 import { clamp, smoothstep } from '../../../../lib/math';
-import { ignition, launchLift } from '../../../lib/flight';
+import { ascentThrust, launchLift } from '../../../lib/flight';
 import { useSceneState } from '../SceneStateContext';
 
 /** Altitude de la couche nuageuse, en unités de scène. */
-const DECK_Y = 44;
+const DECK_Y = 30;
 
 const vertexShader = /* glsl */ `
   varying vec2 vXZ;
@@ -85,7 +85,7 @@ export function CloudDeck() {
     u.uTime!.value = clock.elapsedTime;
     u.uRocketY!.value = top - DECK_Y;
     const near = Math.exp(-Math.abs(launchLift(s.launch) - DECK_Y) / 25);
-    u.uGlow!.value = ignition(s.launch) * (1 - smoothstep(s.sep * 3)) * near;
+    u.uGlow!.value = ascentThrust(s.launch, s.sep) * near;
   });
 
   return (

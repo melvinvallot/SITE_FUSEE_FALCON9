@@ -3,10 +3,10 @@ import { useFrame } from '@react-three/fiber';
 import { BufferAttribute, BufferGeometry, NormalBlending, PerspectiveCamera, ShaderMaterial, type Points } from 'three';
 import { clamp, smoothstep } from '../../../../lib/math';
 import { GROUND_Y, LAUNCH_ALTITUDE } from '../../../data/layout';
-import { ignition, launchLift } from '../../../lib/flight';
+import { ascentThrust, launchLift } from '../../../lib/flight';
 import { useSceneState } from '../SceneStateContext';
 
-const COUNT = 1100;
+const COUNT = 1900;
 /** Sortie des tuyères du propulseur, sous la base du lanceur. */
 const NOZZLE_OFFSET = -0.4;
 
@@ -136,7 +136,7 @@ export function ExhaustTrail() {
     u.uTop!.value = launchLift(s.launch) + NOZZLE_OFFSET;
     u.uOpacity!.value = opacity;
     u.uTime!.value = clock.elapsedTime;
-    u.uFlame!.value = ignition(s.launch) * (1 - smoothstep(s.sep * 3));
+    u.uFlame!.value = ascentThrust(s.launch, s.sep);
     if (camera instanceof PerspectiveCamera) {
       u.uScale!.value = (size.height * gl.getPixelRatio()) / (2 * Math.tan((camera.fov * Math.PI) / 360));
     }

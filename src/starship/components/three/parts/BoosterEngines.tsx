@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { Group } from 'three';
 import { lerp, smoothstep } from '../../../../lib/math';
-import { boostbackBurn, ignition, landingBurn, launchLift } from '../../../lib/flight';
+import { boostbackBurn, ascentThrust, landingBurn, launchLift } from '../../../lib/flight';
 import { useMaterials } from '../materials';
 import { Plume } from '../primitives/Plume';
 import { Raptor, ring } from '../primitives/Raptor';
@@ -62,7 +62,7 @@ export function BoosterEngines({ reducedMotion = false }: { reducedMotion?: bool
           length={10}
           intensity={() => {
             const s = state.current;
-            return ignition(s.launch) * (1 - smoothstep(s.sep * 3));
+            return ascentThrust(s.launch, s.sep);
           }}
           spread={() => Math.min(1, launchLift(state.current.launch) / 45)}
           flicker={!reducedMotion}

@@ -13,6 +13,16 @@ export const launchLift = (launch: number): number => {
   return t * t * LAUNCH_ALTITUDE;
 };
 
+/**
+ * Avancement réel de la séparation. Entre l'ascension et la séparation, la fusée
+ * monte d'abord d'un bloc ; les étages ne se détachent que sur la fin, très haut
+ * au-dessus du pas de tir (la tour est alors loin hors du cadre).
+ */
+export const stage = (sep: number): number => smoothstep((sep - 0.55) / 0.45);
+
+/** Moteurs du propulseur au décollage et pendant l'ascension, coupés à la séparation. */
+export const ascentThrust = (launch: number, sep: number): number => ignition(launch) * (1 - smoothstep(stage(sep) * 3));
+
 /** Cloche : 0 hors de [a, b], 1 au centre, transitions douces. */
 export const bump = (x: number, a: number, b: number): number => {
   if (x <= a || x >= b) return 0;
@@ -32,7 +42,8 @@ export interface BoosterPose {
  * Pose du propulseur Super Heavy : il monte avec le vaisseau, bascule
  * après la séparation, puis redescend se faire capturer par la tour.
  */
-export function boosterPose(launch: number, sep: number, capture: number): BoosterPose {
+export function boosterPose(launch: number, sepInput: number, capture: number): BoosterPose {
+  const sep = stage(sepInput);
   const flight: BoosterPose = {
     x: -1.6 * smoothstep(sep),
     y: launchLift(launch) + BOOSTER_PIVOT - 0.8 * sep,
@@ -48,8 +59,10 @@ export function boosterPose(launch: number, sep: number, capture: number): Boost
 }
 
 /** Altitude de la base du vaisseau, qui continue seul vers l'orbite. */
-export const shipLift = (launch: number, sep: number, capture: number): number =>
-  launchLift(launch) + 10 * sep * sep + 2.5 * sep + 40 * capture;
+export const shipLift = (launch: number, sepInput: number, capture: number): number => {
+  const sep = stage(sepInput);
+  return launchLift(launch) + 10 * sep * sep + 2.5 * sep + 40 * capture;
+};
 
 /** Allumage de retour (« boostback ») : le propulseur, couché, repart vers le pas de tir. */
 export const boostbackBurn = (capture: number): number => bump(capture, 0.1, 0.46);
@@ -59,11 +72,11 @@ export const landingBurn = (capture: number): number => bump(capture, 0.68, 1.02
 
 /** Poussée des moteurs du propulseur : décollage, retour, puis allumage d'atterrissage. */
 export const boosterThrust = (launch: number, sep: number, capture: number): number =>
-  Math.max(ignition(launch) * (1 - smoothstep(sep * 3)), boostbackBurn(capture), landingBurn(capture));
+  Math.max(ascentThrust(launch, sep), boostbackBurn(capture), landingBurn(capture));
 
 /** Poussée des moteurs du vaisseau : allumés pendant la séparation à chaud. */
 export const shipThrust = (sep: number, capture: number): number =>
-  clamp(sep * 5) * (1 - smoothstep(capture * 2.5));
+  clamp(stage(sep) * 5) * (1 - smoothstep(capture * 2.5));
 
 /** Fermeture des bras de capture, à la toute fin du retour. */
 export const armsClosure = (capture: number): number => smoothstep((capture - 0.9) / 0.1);

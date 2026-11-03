@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { MeshBasicMaterial, MeshStandardMaterial, SpriteMaterial, type Group } from 'three';
 import { smoothstep } from '../../../../lib/math';
 import { GROUND_Y } from '../../../data/layout';
+import { launchLift } from '../../../lib/flight';
 import { Steam } from '../primitives/Steam';
 import { useSceneState } from '../SceneStateContext';
 import { concreteTexture, glowTexture } from '../textures';
@@ -44,7 +45,9 @@ export function LaunchSite() {
   useFrame(() => {
     const s = state.current;
     // Le pas de tir s'efface quand la fusée monte haut dans l'atmosphère.
-    fade.current = s.env < 0.5 ? s.site * (1 - smoothstep((s.alt - 0.32) / 0.38)) : 0;
+    // …et dès que la fusée est assez haut pour que la tour sorte du cadre.
+    const height = launchLift(s.launch) * (1 - s.capture);
+    fade.current = s.env < 0.5 ? s.site * (1 - smoothstep((s.alt - 0.32) / 0.38)) * (1 - smoothstep((height - 55) / 30)) : 0;
     const o = fade.current;
     if (group.current) group.current.visible = o > 0.01;
     for (const m of Object.values(mats)) {

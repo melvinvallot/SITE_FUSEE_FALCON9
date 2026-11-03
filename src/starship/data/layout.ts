@@ -67,4 +67,4 @@ export const TOWER_X = -6.4;
 /** Hauteur (base du propulseur) où il est capturé par les bras de la tour. */
 export const CATCH_BASE = 2.4;
 /** Altitude atteinte à la fin de l'ascension, en unités. */
-export const LAUNCH_ALTITUDE = 60;
+export const LAUNCH_ALTITUDE = 140;
