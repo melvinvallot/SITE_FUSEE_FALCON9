@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 import { launchLift } from '../../lib/launch';
 import { useSceneState } from './SceneStateContext';
+import { framingFor, lateralScale } from '../../lib/device';
 
 interface CameraRigProps {
   /** Amplitude de la parallaxe liée au pointeur. */
@@ -20,10 +21,11 @@ export function CameraRig({ parallax = 0.4 }: CameraRigProps) {
 
   useFrame(({ camera, pointer }) => {
     const s = state.current;
-    const narrow = size.width / size.height < 0.9;
+    const aspect = size.width / size.height;
+    const narrow = framingFor(aspect) === 'portrait';
     const lift = launchLift(s.launch) * 0.82;
 
-    v.target.set(s.cameraTarget[0] * (narrow ? 0.12 : 1), s.cameraTarget[1] + lift, s.cameraTarget[2]);
+    v.target.set(s.cameraTarget[0] * (narrow ? 0.12 : lateralScale(aspect)), s.cameraTarget[1] + lift, s.cameraTarget[2]);
     v.pos.set(s.cameraPosition[0], s.cameraPosition[1] + lift, s.cameraPosition[2]);
     if (narrow) {
       // Recul, puis panoramique vers le bas : la pièce remonte dans la moitié haute de l'écran.

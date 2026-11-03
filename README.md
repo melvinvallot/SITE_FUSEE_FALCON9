@@ -16,9 +16,26 @@ Trois pages en React + TypeScript, reliées par un menu commun :
   supposées rondes et dans le même plan), dates calculées à partir du jour de la visite.
   `?planete=mars` ouvre directement un voyage.
 
+### Ordinateur, tablette et téléphone
+
+Le site s'adapte à l'écran, debout comme couché :
+
+- **Téléphone debout** : la 3D en haut, le texte en bas sur un voile sombre ; le menu garde ses trois
+  liens sur une ligne ; une fine barre en haut montre l'avancement.
+- **Téléphone couché** : textes compactés sur un côté, la fusée de l'autre ; les échelles latérales
+  sont masquées. Sur Planètes, la fiche du voyage remplace la liste (la croix y ramène).
+- **Tablette debout** : comme un grand téléphone, avec l'échelle de hauteur ; sur Planètes, la 3D en
+  haut et les panneaux dessous.
+- **Écran tactile** : boutons ↑ ↓ sur Starship à la place des flèches du clavier ; sur Planètes, on
+  tourne en glissant un doigt et on zoome en pinçant.
+- **3D allégée** sur téléphone et tablette (résolution plafonnée, moins d'étoiles, reflets plus
+  légers), et la résolution baisse toute seule si l'appareil n'arrive plus à suivre. `?hq=1` force
+  la qualité maximale.
+
 ### Commandes de la page Starship
 
-- **Flèches du clavier** (ou Page préc./suiv.) : étape précédente ou suivante.
+- **Flèches du clavier** (ou Page préc./suiv.) : étape précédente ou suivante. Sur écran tactile,
+  boutons ↑ et ↓ sous les boutons du haut.
 - **Mode vidéo** : démarre seul après 10 secondes sans action ; il s'arrête dès qu'on fait défiler,
   qu'on touche l'écran ou qu'on appuie sur une touche.
 - **Lancement** : compte à rebours de 10 secondes avec bips, grondement des moteurs et annonces
@@ -59,8 +76,10 @@ La première fois, installez le navigateur des tests : `yarn playwright install 
   séquence de lancement avec compte à rebours, touche Échap ;
 - sur Planètes : la liste des destinations, la fiche de chaque planète (et l'adresse qui suit),
   « Rejouer le voyage », « Aller à l'arrivée », fermeture de la fiche, encadré « Comment on calcule ? » ;
-- que la scène 3D n'est pas noire, qu'il n'y a aucune erreur dans la console, et que les pages
-  tiennent dans la largeur d'un téléphone.
+- que la scène 3D n'est pas noire et qu'il n'y a aucune erreur dans la console ;
+- sur téléphone et tablette, debout et couchés (`e2e/responsive.spec.ts`) : rien ne dépasse de l'écran,
+  le menu tient sur une ligne, l'accueil de Falcon 9 tient sans défiler, boutons ↑ ↓ de Starship,
+  fiche du voyage bien placée sur Planètes, aide « pincer pour zoomer ».
 
 Les listes de sections et de planètes viennent des dossiers `data/` du code : un nouvel écran est testé
 automatiquement. Sans carte graphique (serveur), la 3D est lente : compter un quart d'heure.

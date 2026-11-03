@@ -34,6 +34,24 @@ function stepFrom(ids: readonly string[], dir: 1 | -1, pending: number | null): 
   return i;
 }
 
+/** Réglages en cours, partagés avec les boutons tactiles « étape précédente / suivante ». */
+let stepIds: readonly string[] = [];
+let stepReduced = false;
+let pending: number | null = null;
+
+/**
+ * Passe à l'étape suivante (1) ou précédente (−1), comme les flèches du clavier.
+ * Utilisé par le clavier et par les boutons des écrans tactiles.
+ */
+export function stepSection(dir: 1 | -1): void {
+  if (stepIds.length === 0) return;
+  const index = stepFrom(stepIds, dir, pending);
+  pending = index;
+  void scrollToSection(stepIds[index]!, stepReduced ? 0 : 1100).then((done) => {
+    if (done) pending = null;
+  });
+}
+
 /**
  * Flèches du clavier pour passer d'une étape à l'autre, et mode vidéo
  * automatique après 10 secondes sans défilement ni action.
@@ -41,11 +59,13 @@ function stepFrom(ids: readonly string[], dir: 1 | -1, pending: number | null): 
 export function useDirectorControls(ids: readonly string[], reducedMotion: boolean, autoTour = true): void {
   useEffect(() => {
     configureDirector(ids, reducedMotion);
+    stepIds = ids;
+    stepReduced = reducedMotion;
   }, [ids, reducedMotion]);
 
   useEffect(() => {
     let idle = 0;
-    let pending: number | null = null;
+    pending = null;
 
     const arm = () => {
       window.clearTimeout(idle);
@@ -77,15 +97,13 @@ export function useDirectorControls(ids: readonly string[], reducedMotion: boole
       else arm();
       if (dir === 0) return;
       e.preventDefault();
-      const index = stepFrom(ids, dir, pending);
-      pending = index;
-      void scrollToSection(ids[index]!, reducedMotion ? 0 : 1100).then((done) => {
-        if (done) pending = null;
-      });
+      stepSection(dir);
     };
 
     const pointer = (e: Event) => {
-      pending = null;
+      const target = e.target as Element | null;
+      // Les boutons d'étape gardent l'étape visée : plusieurs appuis s'enchaînent.
+      if (!(target && typeof target.closest === 'function' && target.closest('[data-step]'))) pending = null;
       activity(e);
     };
 

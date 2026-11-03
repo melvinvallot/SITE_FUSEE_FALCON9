@@ -24,13 +24,26 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
+  // Les tests de mise en page (responsive.spec.ts) passent sur téléphone et tablette, debout et couchés.
   projects: [
     {
       name: 'ordinateur',
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
-      testIgnore: /mobile\.spec\.ts/,
+      testIgnore: /responsive\.spec\.ts/,
     },
-    { name: 'telephone', use: { ...devices['Pixel 7'] }, testMatch: /mobile\.spec\.ts/ },
+    { name: 'telephone', use: { ...devices['Pixel 7'] }, testMatch: /responsive\.spec\.ts/ },
+    { name: 'telephone-paysage', use: { ...devices['Pixel 7 landscape'] }, testMatch: /responsive\.spec\.ts/ },
+    // Tablette de 820 × 1180 (taille d'un iPad Air), dans Chromium.
+    {
+      name: 'tablette',
+      use: { ...devices['Galaxy Tab S4'], viewport: { width: 820, height: 1180 } },
+      testMatch: /responsive\.spec\.ts/,
+    },
+    {
+      name: 'tablette-paysage',
+      use: { ...devices['Galaxy Tab S4 landscape'], viewport: { width: 1180, height: 820 } },
+      testMatch: /responsive\.spec\.ts/,
+    },
   ],
   webServer: {
     command: `yarn build && yarn preview --port ${PORT} --strictPort`,

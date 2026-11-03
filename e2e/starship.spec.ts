@@ -34,6 +34,8 @@ test.describe('Page Starship', () => {
   });
 
   test('chaque étape du défilement devient active à son tour', async ({ page }) => {
+    // 25 étapes à parcourir, chacune redessine la 3D : sans carte graphique, il faut plus de 2 minutes.
+    test.slow();
     for (const s of SECTIONS) {
       await scrollToSection(page, s.id);
       await expect(activeSection(page), `section ${s.id}`).toHaveAttribute('id', s.id);

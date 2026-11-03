@@ -16,7 +16,7 @@ const damp = (a: number, b: number, lambda: number, dt: number) => a + (b - a) *
 /**
  * Caméra « réalisateur » : vue d'ensemble au repos, puis caméra de poursuite au
  * départ, plan large pendant la croisière et approche de la planète à l'arrivée.
- * On peut tourner autour (glisser) et zoomer (molette) à tout moment.
+ * On peut tourner autour (glisser) et zoomer (molette, ou pincement à deux doigts) à tout moment.
  */
 export function CameraDirector({ reducedMotion }: { reducedMotion: boolean }) {
   const sim = useSim();
@@ -46,23 +46,49 @@ export function CameraDirector({ reducedMotion }: { reducedMotion: boolean }) {
   const idle = useRef(0);
   const lastChange = useRef(-1);
 
-  // Glisser pour tourner, molette pour zoomer.
+  // Glisser pour tourner ; molette (souris) ou pincement à deux doigts (écran tactile) pour zoomer.
   useEffect(() => {
     const u = user.current;
+    const touches = new Map<number, { x: number; y: number }>();
+    let pinch = 0;
+    const spread = () => {
+      const [a, b] = [...touches.values()];
+      return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0;
+    };
     const down = (e: PointerEvent) => {
-      u.drag = true;
+      touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      u.drag = touches.size === 1;
       u.x = e.clientX;
       u.y = e.clientY;
+      pinch = spread();
     };
     const move = (e: PointerEvent) => {
+      const t = touches.get(e.pointerId);
+      if (!t) return;
+      t.x = e.clientX;
+      t.y = e.clientY;
+      if (touches.size >= 2) {
+        const d = spread();
+        if (pinch > 0 && d > 0) u.tZoom = Math.min(2.4, Math.max(0.3, u.tZoom * (pinch / d)));
+        pinch = d;
+        return;
+      }
       if (!u.drag) return;
       u.tYaw -= (e.clientX - u.x) * 0.005;
       u.tPitch = Math.min(1.1, Math.max(-0.9, u.tPitch + (e.clientY - u.y) * 0.004));
       u.x = e.clientX;
       u.y = e.clientY;
     };
-    const up = () => {
-      u.drag = false;
+    const up = (e: PointerEvent) => {
+      touches.delete(e.pointerId);
+      pinch = spread();
+      // Il reste un doigt après un pincement : il reprend la rotation sans à-coup.
+      const rest = [...touches.values()][0];
+      u.drag = !!rest;
+      if (rest) {
+        u.x = rest.x;
+        u.y = rest.y;
+      }
     };
     const wheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -71,11 +97,13 @@ export function CameraDirector({ reducedMotion }: { reducedMotion: boolean }) {
     dom.addEventListener('pointerdown', down);
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
     dom.addEventListener('wheel', wheel, { passive: false });
     return () => {
       dom.removeEventListener('pointerdown', down);
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
       dom.removeEventListener('wheel', wheel);
     };
   }, [dom]);
@@ -183,13 +211,18 @@ export function CameraDirector({ reducedMotion }: { reducedMotion: boolean }) {
       const pitch = Math.min(1.45 - elev, Math.max(-1.45 - elev, u.pitch));
       v.off.applyAxisAngle(v.axis.normalize(), -pitch);
     }
-    v.off.multiplyScalar(u.zoom);
+    // Écran en hauteur (téléphone, tablette debout) : on recule pour que les plans larges tiennent en largeur.
+    const aspect = size.width / Math.max(1, size.height);
+    const fit = 1 + (Math.min(1.8, Math.max(1, 1.1 / aspect)) - 1) * sim.wide;
+    v.off.multiplyScalar(u.zoom * fit);
     camera.position.copy(v.look).add(v.off);
     camera.lookAt(v.look);
     v.lastLook.copy(v.look);
 
-    // Sur grand écran, le centre de la vue se décale à droite du panneau des destinations.
-    const want = size.width > 900 && !m ? Math.min(200, size.width * 0.13) : 0;
+    // Quand le panneau des destinations est à gauche (grand écran, téléphone couché),
+    // le centre de la vue se décale à sa droite.
+    const beside = size.width > 900 || (size.width > 600 && size.width > size.height * 1.2);
+    const want = beside && !m ? (size.width > 900 ? Math.min(200, size.width * 0.13) : size.width * 0.22) : 0;
     const next = damp(shift.current, want, 3, dt);
     if (camera instanceof PerspectiveCamera && (Math.abs(next - shift.current) > 0.2 || camera.view?.fullWidth !== size.width || camera.view?.fullHeight !== size.height)) {
       shift.current = next;

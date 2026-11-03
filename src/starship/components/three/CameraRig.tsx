@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { launchLift } from '../../lib/flight';
 import { useSceneState } from './SceneStateContext';
+import { framingFor, lateralScale } from '../../../lib/device';
 
 interface CameraRigProps {
   /** Amplitude de la parallaxe liée au pointeur (0 pour la couper). */
@@ -12,7 +13,8 @@ interface CameraRigProps {
 
 /**
  * Place la caméra selon l'état de la scène. Pendant l'ascension, elle suit
- * l'altitude atteinte ; sur écran étroit, la fusée est recentrée et la caméra recule.
+ * l'altitude atteinte ; sur écran étroit, la fusée est recentrée et la caméra recule ;
+ * sur écran panoramique (téléphone couché), elle s'écarte davantage du texte.
  */
 export function CameraRig({ parallax = 0.5, reducedMotion = false }: CameraRigProps) {
   const state = useSceneState();
@@ -21,10 +23,11 @@ export function CameraRig({ parallax = 0.5, reducedMotion = false }: CameraRigPr
 
   useFrame(({ camera, pointer, clock }) => {
     const s = state.current;
-    const narrow = size.width / size.height < 0.9;
+    const aspect = size.width / size.height;
+    const narrow = framingFor(aspect) === 'portrait';
     const anchor = launchLift(s.launch) * (1 - s.capture);
 
-    v.target.set(s.cameraTarget[0] * (narrow ? 0.1 : 1), s.cameraTarget[1] + anchor, s.cameraTarget[2]);
+    v.target.set(s.cameraTarget[0] * (narrow ? 0.1 : lateralScale(aspect)), s.cameraTarget[1] + anchor, s.cameraTarget[2]);
     v.pos.set(s.cameraPosition[0], s.cameraPosition[1] + anchor, s.cameraPosition[2]);
 
     // Balancement lent autour de la cible.

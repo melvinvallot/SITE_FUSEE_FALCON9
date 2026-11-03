@@ -1,5 +1,16 @@
 import { useStoreValue } from '../../../hooks/useStoreValue';
 import { directorStore, enableSound, startLaunch, startTour, stop } from '../../lib/director';
+import { stepSection } from '../../hooks/useDirectorControls';
+import { isTouchDevice } from '../../../lib/device';
+
+/** Écran tactile : pas de flèches du clavier, on affiche des boutons d'étape à la place. */
+const TOUCH = isTouchDevice();
+
+/** Comme une flèche du clavier : reprend la main sur le mode vidéo, puis change d'étape. */
+function step(dir: 1 | -1): void {
+  if (directorStore.get().mode !== 'idle') stop();
+  stepSection(dir);
+}
 
 /**
  * Commandes du mode vidéo et de la séquence de lancement : grand décompte,
@@ -68,7 +79,18 @@ export function DirectorOverlay() {
             </>
           )}
         </div>
-        <p className="director__hint">Flèches du clavier : étape suivante ou précédente</p>
+        {TOUCH ? (
+          <div className="director__steps" data-step="">
+            <button type="button" className="director__button director__step" onClick={() => step(-1)} aria-label="Étape précédente">
+              <span aria-hidden="true">↑</span>
+            </button>
+            <button type="button" className="director__button director__step" onClick={() => step(1)} aria-label="Étape suivante">
+              <span aria-hidden="true">↓</span>
+            </button>
+          </div>
+        ) : (
+          <p className="director__hint">Flèches du clavier : étape suivante ou précédente</p>
+        )}
       </div>
     </>
   );
