@@ -1,5 +1,7 @@
 # Fusées en 3D : Falcon 9, Starship et les planètes
 
+**🚀 Voir le site en ligne : https://melvinvallot.github.io/SITE_FUSEE_FALCON9/**
+
 Trois pages en React + TypeScript, reliées par un menu commun :
 
 - **Falcon 9, pièce par pièce** (`index.html`) : la fusée se démonte au fil du défilement.
