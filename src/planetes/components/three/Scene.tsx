@@ -11,6 +11,8 @@ import { CameraDirector } from './CameraDirector';
 import { Orbits, TransferPath } from './Paths';
 import { Ship } from './Ship';
 import { SimDriver } from './sim';
+import { AdaptiveResolution } from '../../../components/three/AdaptiveResolution';
+import { isLowPower, maxPixelRatio } from '../../../lib/device';
 
 interface SceneProps {
   mission: Mission | null;
@@ -25,20 +27,25 @@ interface SceneProps {
 /** Effets lumineux (halo, vignettage) : désactivables avec `?fx=0` dans l'adresse. */
 const EFFECTS = typeof window === 'undefined' || new URLSearchParams(window.location.search).get('fx') !== '0';
 
+/** Téléphones et tablettes : résolution plafonnée, moins d'étoiles, pas de lissage multiple. */
+const LOW_POWER = isLowPower();
+const MAX_DPR = maxPixelRatio(1.75, LOW_POWER);
+
 /** Système solaire en 3D, en plein écran derrière l'interface. */
 export function Scene({ mission, runId, skipId, nowDay, reducedMotion, onSelect, onReady }: SceneProps) {
   return (
     <div className="scene">
       <Canvas
-        dpr={[1, 1.75]}
+        dpr={[1, MAX_DPR]}
         camera={{ fov: 40, near: 0.05, far: 8000, position: [0, 900, 1500] }}
         gl={{ antialias: !EFFECTS, toneMapping: EFFECTS ? NoToneMapping : ACESFilmicToneMapping, powerPreference: 'high-performance' }}
         onCreated={() => requestAnimationFrame(() => onReady?.())}
       >
         <color attach="background" args={['#020306']} />
         <SimDriver mission={mission} runId={runId} skipId={skipId} nowDay={nowDay} reducedMotion={reducedMotion}>
+          <AdaptiveResolution max={MAX_DPR} />
           <MilkyWay />
-          <Stars radius={900} depth={600} count={9000} factor={7} saturation={0.15} fade speed={reducedMotion ? 0 : 0.4} />
+          <Stars radius={900} depth={600} count={LOW_POWER ? 4500 : 9000} factor={7} saturation={0.15} fade speed={reducedMotion ? 0 : 0.4} />
           <ambientLight intensity={0.22} />
           {/* Reflets de l'acier du vaisseau, générés localement. */}
           <Environment resolution={128} frames={1}>
@@ -57,7 +64,7 @@ export function Scene({ mission, runId, skipId, nowDay, reducedMotion, onSelect,
           <CameraDirector reducedMotion={reducedMotion} />
         </SimDriver>
         {EFFECTS && (
-          <EffectComposer multisampling={4}>
+          <EffectComposer multisampling={LOW_POWER ? 0 : 4}>
             <SanitizePass />
             <Bloom mipmapBlur intensity={1.1} luminanceThreshold={1} luminanceSmoothing={0.25} radius={0.8} />
             <Vignette offset={0.3} darkness={0.6} />

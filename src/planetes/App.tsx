@@ -8,6 +8,14 @@ import { PlanetList } from './components/ui/PlanetList';
 import { MissionCard } from './components/ui/MissionCard';
 import { MissionHud } from './components/ui/MissionHud';
 import { Loader } from './components/ui/Loader';
+import { isTouchDevice } from '../lib/device';
+
+/** Mise en page empilée (téléphone, tablette debout) : la 3D en haut, la page défile dessous. */
+const STACKED = '(max-width: 760px), (max-width: 1100px) and (orientation: portrait)';
+
+const HINT = isTouchDevice()
+  ? 'Glisser pour tourner · pincer pour zoomer · toucher une planète pour y aller'
+  : 'Glisser pour tourner · molette pour zoomer · clic sur une planète pour y aller';
 
 const Scene = lazy(() => import('./components/three/Scene').then((m) => ({ default: m.Scene })));
 
@@ -36,8 +44,12 @@ export default function App() {
     (id: PlanetId) => {
       if (id === targetId) setRunId((n) => n + 1);
       else setTargetId(id);
+      // Sur téléphone, la liste est plus bas dans la page : on remonte voir le voyage.
+      if (window.scrollY > 0 && window.matchMedia?.(STACKED).matches) {
+        window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+      }
     },
-    [targetId],
+    [targetId, reducedMotion],
   );
 
   // L'adresse suit la destination choisie, pour pouvoir la partager.
@@ -113,7 +125,7 @@ export default function App() {
       )}
       {mission && <MissionHud mission={mission} />}
       <p className="hint" aria-hidden="true">
-        Glisser pour tourner · molette pour zoomer · clic sur une planète pour y aller
+        {HINT}
       </p>
     </div>
   );

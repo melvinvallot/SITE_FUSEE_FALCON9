@@ -135,6 +135,7 @@ body {
   font-size: var(--step--1);
   font-weight: 500;
   text-decoration: none;
+  white-space: nowrap;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
@@ -646,8 +647,8 @@ body {
   }
 }
 
-/* ---------- Téléphones ---------- */
-@media (max-width: 760px) {
+/* ---------- Téléphones, et tablettes tenues debout : la 3D en haut, le panneau dessous ---------- */
+@media (max-width: 760px), (max-width: 1100px) and (orientation: portrait) {
   body {
     overflow: auto;
   }
@@ -730,6 +731,121 @@ body {
 
   .planetes .card {
     order: 3;
+  }
+
+  /* Un voyage est en cours : sa fiche passe juste sous la 3D, avant la liste des planètes. */
+  .planetes[data-mission='true'] .card {
+    order: -1;
+    margin-top: calc(58svh - 1rem);
+  }
+
+  .planetes[data-mission='true'] .panel {
+    margin-top: 0;
+  }
+}
+
+/* ---------- Tablette debout : panneaux centrés, pas trop larges ---------- */
+@media (min-width: 761px) and (max-width: 1100px) and (orientation: portrait) {
+  .site-nav {
+    justify-content: space-between;
+  }
+
+  .site-nav__brand {
+    display: block;
+  }
+
+  .panel,
+  .card {
+    width: min(40rem, calc(100% - 2 * var(--gutter)));
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hud {
+    left: 50%;
+    right: auto;
+    width: min(34rem, calc(100vw - 2 * var(--gutter)));
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- Téléphone couché (écran bas et large) ---------- */
+@media (max-height: 520px) and (orientation: landscape) {
+  :root {
+    --nav-h: 3rem;
+  }
+
+  .panel {
+    top: calc(var(--nav-h) + 0.25rem);
+    bottom: 0.6rem;
+    width: min(20rem, 42vw);
+    padding: 0.9rem 1rem 0.8rem;
+  }
+
+  .panel__title {
+    font-size: 1.6rem;
+  }
+
+  .panel__lead {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    margin-bottom: 0.7rem;
+  }
+
+  .dest {
+    padding: 0.45rem 0.65rem 0.5rem;
+  }
+
+  /* Pendant un voyage : la fiche remplace la liste (sa croix y ramène), le tableau de bord passe en bas à droite. */
+  .planetes[data-mission='true'] .panel {
+    display: none;
+  }
+
+  .card {
+    top: calc(var(--nav-h) + 0.25rem);
+    left: var(--gutter);
+    right: auto;
+    width: min(20rem, 42vw);
+    max-height: calc(100svh - var(--nav-h) - 0.85rem);
+    padding: 0.9rem 1rem;
+  }
+
+  .card__title {
+    font-size: 2rem;
+  }
+
+  .card__value {
+    font-size: 2.6rem;
+  }
+
+  .hud {
+    left: auto;
+    right: var(--gutter);
+    bottom: 0.6rem;
+    width: min(24rem, calc(100vw - min(20rem, 42vw) - 3 * var(--gutter)));
+    transform: none;
+    padding: 0.5rem 0.8rem;
+  }
+
+  .hud__head {
+    margin-bottom: 0.3rem;
+  }
+
+  .hud__phase {
+    font-size: 0.95rem;
+  }
+
+  .hud__stats {
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+  }
+
+  .hud__stats dd {
+    font-size: 0.75rem;
+  }
+
+  .hint {
+    display: none;
   }
 }
 

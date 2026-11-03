@@ -56,6 +56,8 @@ body {
 .page {
   position: relative;
   z-index: 1;
+  /* Rien ne doit déborder sur la droite : sinon les téléphones dézooment la page. */
+  overflow-x: clip;
 }
 
 .section {
@@ -198,6 +200,7 @@ body {
   padding: 0.9rem 1.4rem;
   border-radius: 999px;
   cursor: pointer;
+  white-space: nowrap;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -371,6 +374,7 @@ body {
   font-size: var(--step--1);
   font-weight: 500;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .site-nav__link[aria-current='page'] {
@@ -417,7 +421,11 @@ a.button {
   }
 
   .hero__title {
-    font-size: clamp(3.5rem, 21vw, 7rem);
+    font-size: clamp(3rem, 17vw, 7rem);
+  }
+
+  .hero__lead {
+    font-size: 1.125rem;
   }
 
   .part__summary,
@@ -432,6 +440,120 @@ a.button {
 
   .specs__row {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---------- Menu sur petit téléphone : on garde les trois liens sur une ligne ---------- */
+@media (max-width: 520px) {
+  .site-nav {
+    justify-content: center;
+  }
+
+  .site-nav__brand {
+    display: none;
+  }
+
+  .site-nav__link {
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+/* ---------- Tablette debout : la fusée en haut, le texte en bas sur un voile ---------- */
+@media (min-width: 761px) and (max-width: 1100px) and (orientation: portrait) {
+  .section,
+  .section--end {
+    justify-content: flex-start;
+    align-items: flex-end;
+    padding-bottom: 3.5rem;
+  }
+
+  .section__body {
+    max-width: 36rem;
+    padding: 1.75rem 2rem;
+    margin-left: -2rem;
+    border-radius: 1.25rem;
+    background: radial-gradient(120% 100% at 30% 70%, rgba(8, 17, 29, 0.9) 45%, rgba(8, 17, 29, 0));
+  }
+
+  .hero__title {
+    font-size: clamp(5rem, 15vw, 9rem);
+  }
+}
+
+/* ---------- Téléphone couché (écran bas et large) ---------- */
+@media (max-height: 520px) and (orientation: landscape) {
+  :root {
+    --rail: 0rem;
+  }
+
+  .altimeter {
+    display: none;
+  }
+
+  .progress {
+    display: block;
+  }
+
+  .section {
+    padding: 4rem max(1.5rem, env(safe-area-inset-right, 0px)) 1.5rem max(1.5rem, env(safe-area-inset-left, 0px));
+  }
+
+  .section__body {
+    max-width: min(26rem, 50vw);
+  }
+
+  .hero__title {
+    font-size: clamp(3rem, 22vh, 6rem);
+    margin-bottom: 0.75rem;
+  }
+
+  .hero__lead {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .text-block__title,
+  .part__name {
+    font-size: clamp(1.75rem, 10vh, 2.5rem);
+    margin-bottom: 0.6rem;
+  }
+
+  .part__altitude {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .part__summary,
+  .text-block__lead {
+    font-size: 0.875rem;
+    line-height: 1.45;
+    margin-bottom: 0.9rem;
+  }
+
+  .specs {
+    margin-bottom: 1rem;
+  }
+
+  .specs__row {
+    padding: 0.3rem 0;
+    font-size: 0.875rem;
+  }
+
+  .specs--figures {
+    gap: 0.75rem 1.5rem;
+  }
+
+  .specs--figures dd {
+    font-size: 1.9rem;
+  }
+
+  .button {
+    padding: 0.65rem 1.1rem;
+    font-size: 0.9375rem;
+  }
+
+  .fineprint {
+    margin-top: 1rem;
   }
 }
 

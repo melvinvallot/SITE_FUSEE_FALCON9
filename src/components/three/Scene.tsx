@@ -7,6 +7,12 @@ import { TimelineDriver } from './SceneStateContext';
 import { CameraRig } from './CameraRig';
 import { Rocket } from './Rocket';
 import { LaunchSite } from './LaunchSite';
+import { AdaptiveResolution } from './AdaptiveResolution';
+import { isLowPower, maxPixelRatio } from '../../lib/device';
+
+/** Téléphones et tablettes : résolution plafonnée et moins d'étoiles. */
+const LOW_POWER = isLowPower();
+const MAX_DPR = maxPixelRatio(2, LOW_POWER);
 
 interface SceneProps {
   keyframes: readonly Keyframe[];
@@ -19,7 +25,7 @@ export function Scene({ keyframes, progress, reducedMotion = false }: SceneProps
   return (
     <div className="scene" aria-hidden="true">
       <Canvas
-        dpr={[1, 2]}
+        dpr={[1, MAX_DPR]}
         camera={{ fov: 35, near: 0.1, far: 500, position: [10, 6, 24] }}
         gl={{ antialias: true, alpha: true, toneMapping: ACESFilmicToneMapping }}
       >
@@ -33,7 +39,8 @@ export function Scene({ keyframes, progress, reducedMotion = false }: SceneProps
             <Lightformer form="rect" intensity={1.2} color="#8fb3e0" position={[-8, 2, -4]} scale={[8, 10, 1]} />
             <Lightformer form="ring" intensity={0.8} color="#ffffff" position={[0, 12, -8]} scale={6} />
           </Environment>
-          <Stars radius={140} depth={70} count={5000} factor={4} saturation={0} fade speed={reducedMotion ? 0 : 0.4} />
+          <Stars radius={140} depth={70} count={LOW_POWER ? 2500 : 5000} factor={4} saturation={0} fade speed={reducedMotion ? 0 : 0.4} />
+          <AdaptiveResolution max={MAX_DPR} />
           <CameraRig parallax={reducedMotion ? 0 : 0.4} />
           <Rocket reducedMotion={reducedMotion} />
           <LaunchSite />
