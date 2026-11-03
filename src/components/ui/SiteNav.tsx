@@ -1,15 +1,16 @@
-export type SiteId = 'falcon9' | 'starship';
+export type SiteId = 'falcon9' | 'starship' | 'planetes';
 
 const LINKS: { id: SiteId; label: string; href: string }[] = [
   { id: 'falcon9', label: 'Falcon 9', href: './' },
   { id: 'starship', label: 'Starship', href: './starship.html' },
+  { id: 'planetes', label: 'Planètes', href: './planetes.html' },
 ];
 
 interface SiteNavProps {
   current: SiteId;
 }
 
-/** Barre commune aux deux pages : passe d'une fusée à l'autre. */
+/** Barre commune aux pages du site : Falcon 9, Starship et les voyages vers les planètes. */
 export function SiteNav({ current }: SiteNavProps) {
   return (
     <nav className="site-nav" aria-label="Fusées">

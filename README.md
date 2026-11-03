@@ -1,6 +1,6 @@
-# Fusées en 3D : Falcon 9 et Starship
+# Fusées en 3D : Falcon 9, Starship et les planètes
 
-Deux pages en React + TypeScript, reliées par un menu commun :
+Trois pages en React + TypeScript, reliées par un menu commun :
 
 - **Falcon 9, pièce par pièce** (`index.html`) : la fusée se démonte au fil du défilement.
 - **Starship, de la pointe aux moteurs** (`starship.html`) : 25 écrans en 5 chapitres. Vue éclatée,
@@ -8,6 +8,11 @@ Deux pages en React + TypeScript, reliées par un menu commun :
   tour de lancement, décollage, séparation à chaud dans la mésosphère (échelle des couches de
   l'atmosphère), retour du propulseur en quatre étapes jusqu'à sa capture par la tour,
   ravitaillement en orbite au-dessus de la Terre, puis arrivée sur Mars.
+- **Starship vers les planètes** (`planetes.html`) : combien de temps pour aller de la Terre à chaque
+  planète. On choisit une destination ; la 3D attend la prochaine fenêtre de tir, suit Starship sur son
+  ellipse de transfert puis le met en orbite. Durées estimées par un transfert de Hohmann (orbites
+  supposées rondes et dans le même plan), dates calculées à partir du jour de la visite.
+  `?planete=mars` ouvre directement un voyage.
 
 ### Commandes de la page Starship
 
@@ -24,7 +29,7 @@ Deux pages en React + TypeScript, reliées par un menu commun :
 
 ```bash
 yarn install   # installe les dépendances
-yarn dev       # http://localhost:5173 (Falcon 9) et http://localhost:5173/starship.html
+yarn dev       # http://localhost:5173 (Falcon 9), /starship.html et /planetes.html
 yarn test      # lance les tests (Vitest)
 yarn build     # build de production des deux pages dans dist/
 ```
@@ -34,6 +39,7 @@ Si `yarn` n'est pas installé : `npm install -g yarn`.
 ## Organisation
 
 - `src/` : page Falcon 9 et code partagé (`lib/`, `hooks/`, `components/ui/` dont `SiteNav`)
+- `src/planetes/` : page des voyages vers les planètes (`lib/orbits.ts` : calculs testés, `components/three/` : système solaire en 3D, shaders des planètes)
 - `src/starship/` : page Starship
   - `data/` : contenu des sections, chapitres, images clés, jauge, télémétrie, cotes du modèle
   - `lib/` : logique pure testée (timeline, séquence de vol, télémétrie, progression par section)
