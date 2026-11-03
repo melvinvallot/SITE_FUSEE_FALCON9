@@ -5,6 +5,7 @@ import { RADIUS, STACK_YAW } from '../../../data/layout';
 import { useMaterials } from '../materials';
 import { GridFin } from '../primitives/GridFin';
 import { useSceneState } from '../SceneStateContext';
+import { FINE, Kit, useKits } from '../detail';
 
 const FIN_Y = 16.25;
 /**
@@ -19,6 +20,19 @@ export function GridFins() {
   const state = useSceneState();
   const fins = useRef<(Group | null)[]>([]);
 
+  // Fixations sur la coque, qui ne tournent pas avec l'aileron.
+  const { mount } = useKits(() => {
+    const k = new Kit();
+    // Tôle de renfort et boîtier du moteur électrique d'orientation, avec son carénage.
+    k.box([0.02, 0.95, 0.75], [-0.05, 0, 0]);
+    k.box([0.12, 0.3, 0.36], [-0.02, 0, 0]);
+    k.capsule(0.09, 0.42, [-0.02, -0.38, 0], [0, 0, 0], [0.8, 1, 1.4]);
+    if (FINE) {
+      for (const z of [-0.33, -0.2, 0.2, 0.33]) for (const y of [-0.42, 0.42]) k.cyl(0.012, 0.012, 0.02, [-0.035, y, z], [0, 0, Math.PI / 2], 6);
+    }
+    return { mount: k.build() };
+  });
+
   useFrame(({ clock }) => {
     const s = state.current;
     const t = clock.elapsedTime;
@@ -31,6 +45,7 @@ export function GridFins() {
       {ANGLES.map((a, i) => (
         <group key={a} rotation={[0, -a, 0]}>
           <group position={[RADIUS + 0.05, 0, 0]}>
+            <mesh geometry={mount} material={m.sooty} />
             <group ref={(g) => (fins.current[i] = g)}>
               <GridFin materials={m} />
             </group>

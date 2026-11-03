@@ -9,6 +9,8 @@ import { Flap } from '../primitives/Flap';
 import { TankSection } from '../primitives/TankSection';
 import { Frost } from '../primitives/Frost';
 import { useSceneState } from '../SceneStateContext';
+import { Kit, useKits } from '../detail';
+import { ShipDetails, hingeCover } from './ShipDetails';
 import { STEEL_TILE, TILE_TILE, scaleUv } from '../textures';
 
 const { base, barrelTop } = LAYOUT.ship;
@@ -38,6 +40,12 @@ export function ShipBody() {
     const doorArc = (r: number) => new CylinderGeometry(r, r, DOOR_H, 16, 1, true, Math.PI - DOOR_ARC / 2, DOOR_ARC);
     return { barrel, shield, slot: doorArc(RADIUS + 0.006), door: doorArc(RADIUS + 0.02) };
   }, []);
+
+  const covers = useKits(() => {
+    const k = new Kit();
+    hingeCover(k, 3.75, 0.13, 0.08);
+    return { steel: k.build() };
+  });
 
   useFrame(({ clock }) => {
     const s = state.current;
@@ -69,9 +77,12 @@ export function ShipBody() {
       <mesh material={m.steel} position={[-RADIUS * 0.72, base + H / 2, -RADIUS * 0.72]} rotation={[0, Math.PI / 4, 0]}>
         <boxGeometry args={[0.22, H - 0.6, 0.12]} />
       </mesh>
+      <ShipDetails m={m} />
       {/* Volets arrière, sur la frontière entre tuiles et acier. */}
       {[1, -1].map((side, i) => (
         <group key={side} position={[side * RADIUS, base + 0.55, 0]} scale={[side, 1, 1]}>
+          {/* Carénage de la charnière et de ses moteurs électriques, côté sous le vent. */}
+          <mesh geometry={covers.steel} material={m.steel} />
           <group ref={(g) => (flaps.current[i] = g)}>
             <Flap materials={m} length={3.9} root={1.25} tip={0.8} />
           </group>

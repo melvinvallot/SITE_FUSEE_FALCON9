@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import { ExtrudeGeometry, Shape, ShapeGeometry } from 'three';
-import { TILE_TILE, scaleUv } from '../textures';
+import { STEEL_TILE, TILE_TILE, scaleUv } from '../textures';
 import type { MaterialSet } from '../materials';
+import { FINE, Kit, projectUv } from '../detail';
 
 interface FlapProps {
   materials: MaterialSet;
@@ -26,10 +27,22 @@ export function Flap({ materials, length, root, tip }: FlapProps) {
     shape.lineTo(0, 0);
     const body = new ExtrudeGeometry(shape, { depth: 0.05, bevelEnabled: true, bevelSize: 0.015, bevelThickness: 0.015, bevelSegments: 2 });
     body.translate(0, 0, -0.025);
+    // UV de l'acier à l'échelle réelle (sinon les anneaux soudés apparaissent minuscules).
+    projectUv(body, STEEL_TILE);
     const face = scaleUv(new ShapeGeometry(shape), 1, 1, TILE_TILE);
     face.translate(0, 0, 0.042);
     return [body, face];
   }, [length, root, tip]);
+
+  // Tube de charnière et ses paliers, le long de l'emplanture.
+  const hinge = useMemo(() => {
+    const k = new Kit();
+    k.cyl(0.032, 0.032, length * 0.92, [0.015, length * 0.48, -0.01], [0, 0, 0], 12);
+    const knuckles = FINE ? 5 : 3;
+    for (let i = 0; i < knuckles; i++) k.cyl(0.05, 0.05, 0.08, [0.015, length * (0.08 + (0.8 * i) / (knuckles - 1)), -0.01], [0, 0, 0], 12);
+    return k.build();
+  }, [length]);
+  useEffect(() => () => hinge.dispose(), [hinge]);
 
   useEffect(
     () => () => {
@@ -43,6 +56,7 @@ export function Flap({ materials, length, root, tip }: FlapProps) {
     <group>
       <mesh geometry={body} material={materials.steel} />
       <mesh geometry={face} material={materials.tiles} />
+      <mesh geometry={hinge} material={materials.sooty} />
     </group>
   );
 }
