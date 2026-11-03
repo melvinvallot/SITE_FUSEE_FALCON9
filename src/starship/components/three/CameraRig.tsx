@@ -38,9 +38,9 @@ export function CameraRig({ parallax = 0.5, reducedMotion = false }: CameraRigPr
     }
 
     if (narrow) {
-      // Recul, puis panoramique vers le bas : le sujet remonte dans la moitié haute de l'écran.
-      v.pos.sub(v.target).multiplyScalar(1.5).add(v.target);
-      const pan = v.pos.distanceTo(v.target) * 0.16;
+      // Recul, puis léger panoramique vers le bas : le sujet reste entier sous le menu, au-dessus du texte.
+      v.pos.sub(v.target).multiplyScalar(1.6).add(v.target);
+      const pan = v.pos.distanceTo(v.target) * 0.06;
       v.pos.y -= pan;
       v.target.y -= pan;
     }

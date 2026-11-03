@@ -28,9 +28,9 @@ export function CameraRig({ parallax = 0.4 }: CameraRigProps) {
     v.target.set(s.cameraTarget[0] * (narrow ? 0.12 : lateralScale(aspect)), s.cameraTarget[1] + lift, s.cameraTarget[2]);
     v.pos.set(s.cameraPosition[0], s.cameraPosition[1] + lift, s.cameraPosition[2]);
     if (narrow) {
-      // Recul, puis panoramique vers le bas : la pièce remonte dans la moitié haute de l'écran.
-      v.pos.sub(v.target).multiplyScalar(1.45).add(v.target);
-      const pan = v.pos.distanceTo(v.target) * 0.2;
+      // Recul, puis léger panoramique vers le bas : la pièce reste entière sous le menu, au-dessus du texte.
+      v.pos.sub(v.target).multiplyScalar(1.55).add(v.target);
+      const pan = v.pos.distanceTo(v.target) * 0.08;
       v.pos.y -= pan;
       v.target.y -= pan;
     }
