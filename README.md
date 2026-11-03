@@ -31,6 +31,11 @@ yarn build     # build de production des deux pages dans dist/
 
 Si `yarn` n'est pas installé : `npm install -g yarn`.
 
+## Crédits
+
+Cartes de la Terre (`src/starship/assets/earth/`) : [Solar System Scope](https://www.solarsystemscope.com/textures/),
+licence CC BY 4.0, d'après les données de la NASA.
+
 ## Organisation
 
 - `src/` : page Falcon 9 et code partagé (`lib/`, `hooks/`, `components/ui/` dont `SiteNav`)

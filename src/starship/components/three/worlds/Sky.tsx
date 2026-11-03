@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { BackSide, Color, ShaderMaterial, type Mesh } from 'three';
+import { BackSide, Color, ShaderMaterial, Vector3, type Mesh } from 'three';
 import { clamp } from '../../../../lib/math';
 import { useSceneState } from '../SceneStateContext';
+import { SUN_DIRECTION } from './OrbitWorld';
+
+const SKY_SUN = new Vector3(0.6, 0.25, -0.75);
 
 const vertexShader = /* glsl */ `
   varying vec3 vDir;
@@ -18,6 +21,8 @@ const fragmentShader = /* glsl */ `
   uniform vec3 uBottom;
   uniform vec3 uSunDir;
   uniform vec3 uSunColor;
+  /** Halo diffus autour du Soleil (nul dans le vide spatial). */
+  uniform float uHaze;
   /** Altitude apparente (0 = sol, 1 = haute atmosphère), seulement près de la Terre. */
   uniform float uAlt;
   varying vec3 vDir;
@@ -35,7 +40,7 @@ const fragmentShader = /* glsl */ `
     float h = dir.y;
     vec3 color = h > 0.0 ? mix(uHorizon, uTop, pow(smoothstep(0.0, 0.6, h), 0.7)) : mix(uHorizon, uBottom, smoothstep(0.0, 0.25, -h));
     float sun = max(0.0, dot(dir, normalize(uSunDir)));
-    color += uSunColor * (pow(sun, 8.0) * 0.35 + pow(sun, 400.0) * 2.0);
+    color += uSunColor * (pow(sun, 8.0) * 0.35 * uHaze + pow(sun, 400.0) * 2.0);
 
     if (uAlt > 0.001) {
       // Horizon abaissé par l'altitude : la Terre devient une sphère vue d'en haut.
@@ -93,7 +98,8 @@ export function Sky() {
           uTop: { value: new Color() },
           uHorizon: { value: new Color() },
           uBottom: { value: new Color() },
-          uSunDir: { value: [0.6, 0.25, -0.75] },
+          uSunDir: { value: new Vector3(0.6, 0.25, -0.75) },
+          uHaze: { value: 1 },
           uSunColor: { value: new Color() },
           uAlt: { value: 0 },
         },
@@ -119,6 +125,10 @@ export function Sky() {
     (u.uBottom!.value as Color).copy(a.bottom).lerp(b.bottom, t);
     (u.uSunColor!.value as Color).copy(a.sun).lerp(b.sun, t);
     // En montant, le ciel nocturne cède la place au noir de l'espace et au limbe terrestre.
+    // En orbite, pas d'air pour diffuser la lumière : seul le disque solaire reste, dans l'axe de l'éclairage.
+    const space = 1 - Math.abs(env - 1);
+    u.uHaze!.value = 1 - clamp(space * 2);
+    (u.uSunDir!.value as Vector3).copy(env > 0.5 && env < 1.5 ? SUN_DIRECTION : SKY_SUN);
     u.uAlt!.value = clamp(state.current.alt) * clamp(1 - env);
   });
 

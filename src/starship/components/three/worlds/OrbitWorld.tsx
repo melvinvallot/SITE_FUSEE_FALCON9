@@ -1,70 +1,49 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { AdditiveBlending, BackSide, ShaderMaterial, Vector3, type Group } from 'three';
+import { ShaderMaterial, Vector3, type Group } from 'three';
 import { lerp, smoothstep } from '../../../../lib/math';
 import { ShipModel } from '../ShipModel';
 import { useSceneState } from '../SceneStateContext';
 import { NOISE_GLSL } from './noise.glsl';
+import { Earth } from './Earth';
 
-/** Direction du Soleil, partagée avec l'éclairage. */
-export const SUN_DIRECTION = new Vector3(0.75, 0.32, -0.58).normalize();
+/**
+ * Direction du Soleil, partagée avec l'éclairage : derrière la caméra, à droite.
+ * Les vaisseaux sont éclairés de face et le terminateur (jour/nuit) passe à l'horizon.
+ */
+export const SUN_DIRECTION = new Vector3(0.62, 0.5, 0.6).normalize();
 
-const earthVertex = /* glsl */ `
+/** La Lune, au loin : mers sombres et cratères générés par du bruit. */
+const moonVertex = /* glsl */ `
   varying vec3 vNormal;
-  varying vec3 vPos;
-  varying vec3 vView;
+  varying vec3 vLocal;
   void main() {
-    vPos = position;
+    vLocal = normalize(position);
     vNormal = normalize(mat3(modelMatrix) * normal);
-    vec4 world = modelMatrix * vec4(position, 1.0);
-    vView = normalize(cameraPosition - world.xyz);
-    gl_Position = projectionMatrix * viewMatrix * world;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
 
-const earthFragment = /* glsl */ `
+const moonFragment = /* glsl */ `
   uniform vec3 uSun;
-  uniform float uTime;
   varying vec3 vNormal;
-  varying vec3 vPos;
-  varying vec3 vView;
+  varying vec3 vLocal;
   ${NOISE_GLSL}
   void main() {
-    vec3 p = normalize(vPos);
-    float land = fbm(p * 2.2 + vec3(4.1, 1.3, 7.7));
-    float clouds = fbm(p * 5.0 + vec3(uTime * 0.004, 0.0, uTime * 0.002));
-    vec3 ocean = mix(vec3(0.01, 0.06, 0.16), vec3(0.03, 0.16, 0.32), smoothstep(-0.3, 0.1, land));
-    vec3 ground = mix(vec3(0.16, 0.24, 0.1), vec3(0.42, 0.34, 0.22), smoothstep(0.1, 0.45, land));
-    vec3 color = land > 0.06 ? ground : ocean;
-    color = mix(color, vec3(0.95), smoothstep(0.05, 0.45, clouds) * 0.85);
-    float light = dot(normalize(vNormal), normalize(uSun));
-    float day = smoothstep(-0.12, 0.25, light);
-    vec3 night = vec3(1.0, 0.72, 0.4) * smoothstep(0.25, 0.4, land) * smoothstep(0.3, 0.0, clouds) * 0.08;
-    // Reflet du Soleil sur les océans.
-    vec3 h = normalize(normalize(uSun) + vView);
-    float spec = pow(max(dot(normalize(vNormal), h), 0.0), 60.0) * (land > 0.06 ? 0.0 : 0.6);
-    vec3 lit = color * (0.08 + 1.1 * max(light, 0.0)) + spec;
-    float rim = pow(1.0 - clamp(dot(normalize(vNormal), normalize(vView)), 0.0, 1.0), 3.0);
-    lit += vec3(0.3, 0.55, 1.0) * rim * day * 0.8;
-    gl_FragColor = vec4(mix(night, lit, day), 1.0);
+    float maria = smoothstep(0.05, 0.35, fbm(vLocal * 1.6 + 3.0));
+    float craters = fbm(vLocal * 9.0) * 0.5 + 0.5;
+    vec3 albedo = mix(vec3(0.62, 0.61, 0.6), vec3(0.32, 0.32, 0.34), maria) * (0.8 + 0.35 * craters);
+    float light = max(dot(normalize(vNormal), normalize(uSun)), 0.0);
+    gl_FragColor = vec4(albedo * (0.015 + 1.3 * light), 1.0);
   }
 `;
 
-const atmosphereFragment = /* glsl */ `
-  uniform vec3 uSun;
-  varying vec3 vNormal;
-  varying vec3 vView;
-  varying vec3 vPos;
-  void main() {
-    float rim = pow(1.0 - clamp(abs(dot(normalize(vNormal), normalize(vView))), 0.0, 1.0), 2.2);
-    float day = smoothstep(-0.3, 0.4, dot(normalize(vNormal), normalize(uSun)));
-    gl_FragColor = vec4(vec3(0.35, 0.6, 1.0) * 1.6, rim * day);
-  }
-`;
-
-const EARTH_RADIUS = 210;
-const EARTH_CENTER: [number, number, number] = [0, -228, -70];
+const EARTH_RADIUS = 600;
+const EARTH_CENTER: [number, number, number] = [0, -640, -120];
 const ORBIT_Y = 14;
+/** Point de la Terre survolé par les vaisseaux : le golfe du Mexique, près de Starbase. */
+const OVERFLIGHT = { latitude: 23, longitude: -91 };
+const UNDER_SHIPS = new Vector3(-EARTH_CENTER[0], ORBIT_Y - EARTH_CENTER[1], -EARTH_CENTER[2]).normalize();
 
 /**
  * Orbite basse : la Terre en contrebas et deux vaisseaux qui s'arriment par
@@ -75,40 +54,17 @@ export function OrbitWorld() {
   const root = useRef<Group>(null);
   const tanker = useRef<Group>(null);
   const receiver = useRef<Group>(null);
-  const spin = useRef<Group>(null);
-
-  const [earth, atmosphere] = useMemo(() => {
-    const uniforms = { uSun: { value: SUN_DIRECTION }, uTime: { value: 0 } };
-    return [
-      new ShaderMaterial({ vertexShader: earthVertex, fragmentShader: earthFragment, uniforms }),
-      new ShaderMaterial({
-        vertexShader: earthVertex,
-        fragmentShader: atmosphereFragment,
-        uniforms,
-        transparent: true,
-        depthWrite: false,
-        blending: AdditiveBlending,
-        side: BackSide,
-        toneMapped: false,
-      }),
-    ];
-  }, []);
-
-  useEffect(
-    () => () => {
-      earth.dispose();
-      atmosphere.dispose();
-    },
-    [earth, atmosphere],
+  const moon = useMemo(
+    () => new ShaderMaterial({ vertexShader: moonVertex, fragmentShader: moonFragment, uniforms: { uSun: { value: SUN_DIRECTION } } }),
+    [],
   );
+  useEffect(() => () => moon.dispose(), [moon]);
 
-  useFrame(({ clock }, delta) => {
+  useFrame(() => {
     const s = state.current;
     const visible = s.env >= 0.5 && s.env < 1.5;
     if (root.current) root.current.visible = visible;
     if (!visible) return;
-    earth.uniforms.uTime!.value = clock.elapsedTime;
-    if (spin.current) spin.current.rotation.y += Math.min(delta, 0.1) * 0.004;
     const dock = smoothstep(s.refuel);
     tanker.current?.position.set(lerp(9, 0.02, dock), ORBIT_Y + lerp(1.2, 0, dock), lerp(-2, 0, dock));
     receiver.current?.position.set(0, ORBIT_Y, 0);
@@ -117,15 +73,12 @@ export function OrbitWorld() {
   return (
     <group ref={root}>
       <group position={EARTH_CENTER}>
-        <group ref={spin} rotation={[0.35, 0, 0.2]}>
-          <mesh material={earth}>
-            <sphereGeometry args={[EARTH_RADIUS, 128, 64]} />
-          </mesh>
-        </group>
-        <mesh material={atmosphere} scale={1.035}>
-          <sphereGeometry args={[EARTH_RADIUS, 96, 48]} />
-        </mesh>
+        <Earth radius={EARTH_RADIUS} sun={SUN_DIRECTION} latitude={OVERFLIGHT.latitude} longitude={OVERFLIGHT.longitude} up={UNDER_SHIPS} />
       </group>
+      {/* La Lune, loin derrière les vaisseaux (taille apparente exagérée). */}
+      <mesh material={moon} position={[260, 70, -760]}>
+        <sphereGeometry args={[16, 48, 24]} />
+      </mesh>
       {/* Vaisseau à ravitailler (nez vers -x) et ravitailleur (nez vers +x), ventre vers la Terre. */}
       <group ref={receiver}>
         <group rotation={[Math.PI / 2, 0, 0]}>
