@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  // Chemins relatifs : le site marche aussi dans un sous-dossier,
+  // comme sur GitHub Pages (melvinvallot.github.io/site_fusee_falcon9/).
+  base: './',
   build: {
     rollupOptions: {
       // Deux pages : Falcon 9 (index.html) et Starship (starship.html).
