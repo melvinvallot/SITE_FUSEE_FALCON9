@@ -29,5 +29,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // Les tests dans le navigateur (dossier e2e) sont lancés par Playwright : `yarn test:e2e`.
+    exclude: ['**/node_modules/**', 'e2e/**'],
   },
 });

@@ -34,6 +34,34 @@ yarn test      # lance les tests (Vitest)
 yarn build     # build de production des deux pages dans dist/
 ```
 
+## Tests
+
+Deux familles de tests :
+
+```bash
+yarn test       # tests unitaires (Vitest) : calculs, données, composants. Quelques secondes.
+yarn test:e2e   # tests dans un vrai navigateur (Playwright) : tout le site, page par page.
+yarn test:all   # les deux à la suite
+yarn test:e2e:ui  # interface de Playwright pour voir les tests se dérouler
+```
+
+La première fois, installez le navigateur des tests : `yarn playwright install chromium`.
+
+`yarn test:e2e` construit le site, le sert sur http://localhost:4173 puis vérifie (dossier `e2e/`) :
+
+- le menu commun (lien de la page en cours, passage d'une page à l'autre) ;
+- chaque section de chaque page (présente, avec son titre, et active quand on y défile) ;
+- les boutons : « Démonter le lanceur », échelle de hauteur de Falcon 9, jauge et chapitres de
+  Starship, « Revenir au début », liens de fin de page ;
+- sur Starship : flèches du clavier, bouton du son, mode vidéo (bouton et démarrage seul après 10 s),
+  séquence de lancement avec compte à rebours, touche Échap ;
+- que la scène 3D n'est pas noire, qu'il n'y a aucune erreur dans la console, et que les pages
+  tiennent dans la largeur d'un téléphone.
+
+Les listes de sections viennent de `src/data/` et `src/starship/data/` : un nouvel écran est testé
+automatiquement. Sans carte graphique (serveur), la 3D est lente : compter une dizaine de minutes.
+Les tests tournent aussi sur GitHub à chaque pull request (`.github/workflows/tests.yml`).
+
 Si `yarn` n'est pas installé : `npm install -g yarn`.
 
 ## Crédits
