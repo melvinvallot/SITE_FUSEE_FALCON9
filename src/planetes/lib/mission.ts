@@ -22,7 +22,7 @@ export interface Frame {
 
 /** Part du trajet (temps d'animation) consacrée au départ, et début du freinage. */
 export const DEPART_END = 0.07;
-export const FLIP_START = 0.8;
+export const FLIP_START = 0.74;
 export const BRAKE_START = 0.86;
 
 /**
