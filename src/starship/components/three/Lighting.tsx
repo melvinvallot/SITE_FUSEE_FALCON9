@@ -8,7 +8,7 @@ import { SUN_DIRECTION } from './worlds/OrbitWorld';
 /** Réglages d'éclairage par décor : nuit au pas de tir, orbite, Mars. */
 const RIGS = [
   { sky: '#bcd3ef', ground: '#1a2433', hemi: 0.75, key: '#fff3e2', keyI: 2.6, keyPos: [14, 20, 12], fill: '#7fa6d9', fillI: 1.3 },
-  { sky: '#0b1426', ground: '#3d6db5', hemi: 0.35, key: '#ffffff', keyI: 4.2, keyPos: [SUN_DIRECTION.x * 40, SUN_DIRECTION.y * 40, SUN_DIRECTION.z * 40 + 30], fill: '#3d6db5', fillI: 0.5 },
+  { sky: '#0b1426', ground: '#3d6db5', hemi: 0.3, key: '#fff6ea', keyI: 2.4, keyPos: [SUN_DIRECTION.x * 40, SUN_DIRECTION.y * 40, SUN_DIRECTION.z * 40 + 30], fill: '#3d6db5', fillI: 0.5 },
   { sky: '#f0c39a', ground: '#7a4127', hemi: 0.9, key: '#ffd9b0', keyI: 3.2, keyPos: [-20, 14, 18], fill: '#9bb2d8', fillI: 0.5 },
 ] as const;
 

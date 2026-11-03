@@ -111,7 +111,8 @@ export default function App() {
                       <p className="fineprint">
                         Chiffres issus de la page Starship de SpaceX (spacex.com/vehicles/starship). Les repères de vol
                         sont approximatifs ; la charge de Falcon 9 est celle de la version non récupérée. Modèle 3D
-                        simplifié, réalisé à des fins pédagogiques. Ce site n’est pas affilié à SpaceX.
+                        simplifié, réalisé à des fins pédagogiques. Cartes de la Terre : Solar System Scope (CC BY 4.0), d’après
+                        la NASA. Ce site n’est pas affilié à SpaceX.
                       </p>
                     </>
                   )}
