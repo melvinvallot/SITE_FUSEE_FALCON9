@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { EARTH } from '../../data/planets';
+import { totalSeconds } from '../../lib/mission';
 import { planetAngle } from '../../lib/orbits';
 import { scenePosition } from '../../lib/scale';
 import { arrivalCameraAngle, parkRadius, useSim } from './sim';
@@ -149,7 +150,7 @@ export function CameraDirector({ reducedMotion }: { reducedMotion: boolean }) {
     } else {
       const s = f.phase === 'window' ? 0 : f.s;
       const arriving = f.phase === 'arrived' ? 1 : smooth((s - 0.72) / 0.16);
-      const chase = f.phase === 'window' || f.phase === 'arrived' ? 0 : 1 - smooth((s - 0.06) / 0.14);
+      const chase = f.phase === 'window' || f.phase === 'arrived' ? 0 : f.phase === 'depart' ? 1 : 1 - smooth((s - f.departEnd) / 0.14);
       const wide = Math.max(0, 1 - chase - arriving);
       sim.wide = f.phase === 'window' ? 1 : wide;
 
@@ -182,7 +183,7 @@ export function CameraDirector({ reducedMotion }: { reducedMotion: boolean }) {
       if (arriving > 0) {
         const c = sim.positions[m.target.id];
         const R = m.target.radius;
-        const since = f.phase === 'arrived' && sim.timing ? sim.elapsed - sim.timing.window - sim.timing.cruise : 0;
+        const since = f.phase === 'arrived' && sim.timing ? sim.elapsed - totalSeconds(sim.timing) : 0;
         const phi = arrivalCameraAngle(c, since);
         const dist = Math.max(R * 4.6, parkRadius(m.target) * 2.1);
         v.p.set(Math.cos(phi), 0.32, -Math.sin(phi)).normalize().multiplyScalar(dist).add(c);
