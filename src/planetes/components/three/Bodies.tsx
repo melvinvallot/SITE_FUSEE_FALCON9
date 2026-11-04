@@ -157,7 +157,7 @@ export function PlanetBody({ planet, selected, onSelect }: PlanetBodyProps) {
       const d = camera.position.distanceTo(pos);
       // Pendant un voyage, les étiquettes ne s'affichent que dans les plans larges.
       const f = sim.frame;
-      const wide = !f || f.phase === 'window' || (f.phase === 'cruise' && f.s > 0.22 && f.s < 0.7);
+      const wide = !f || f.phase === 'window' || (f.phase === 'cruise' && f.s > f.departEnd + 0.15 && f.s < 0.7);
       const show = wide && d > R * 14 && d < 900;
       label.current.style.opacity = show ? '1' : '0';
       label.current.style.pointerEvents = show ? 'auto' : 'none';

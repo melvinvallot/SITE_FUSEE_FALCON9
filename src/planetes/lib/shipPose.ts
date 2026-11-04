@@ -1,6 +1,6 @@
 import { Quaternion, Vector3 } from 'three';
 import { EARTH, type Planet } from '../data/planets';
-import { BRAKE_START, DEPART_END, FLIP_START, frameAt, totalSeconds, type Frame, type Timing } from './mission';
+import { BRAKE_START, FLIP_START, frameAt, totalSeconds, type Frame, type Timing } from './mission';
 import { planetAngle, shipState, type Mission } from './orbits';
 import { scenePosition } from './scale';
 
@@ -98,8 +98,10 @@ function flightPose(m: Mission, f: Frame, out: ShipPose) {
   out.quat.multiply(tmpQ);
 
   out.burn = 0;
-  if (f.phase === 'depart' || (f.phase === 'cruise' && f.s < DEPART_END + 0.03)) {
-    out.burn = 1 - smooth((f.s - DEPART_END) / 0.03);
+  if (f.phase === 'depart') {
+    out.burn = 1;
+  } else if (f.phase === 'cruise' && f.s < f.departEnd + 0.03) {
+    out.burn = 1 - smooth((f.s - f.departEnd) / 0.03);
   } else if (f.phase === 'brake') {
     out.burn = smooth((f.s - BRAKE_START) / 0.02) * (1 - smooth((f.s - 0.985) / 0.015));
   }

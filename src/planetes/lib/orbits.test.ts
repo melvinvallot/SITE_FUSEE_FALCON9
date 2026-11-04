@@ -1,5 +1,5 @@
 import { DESTINATIONS, EARTH, planetById } from '../data/planets';
-import { cruiseEase, frameAt, timing } from './mission';
+import { DEPART_SECONDS, cruiseEase, frameAt, timing, totalSeconds } from './mission';
 import {
   dayFromDate,
   daysToWindow,
@@ -114,8 +114,25 @@ describe('animation de la mission', () => {
     const t = timing(m);
     expect(frameAt(m, t, 0).day).toBeCloseTo(NOW, 6);
     expect(frameAt(m, t, t.window).day).toBeCloseTo(m.launchDay, 6);
-    expect(frameAt(m, t, t.window + t.cruise).phase).toBe('arrived');
+    expect(frameAt(m, t, totalSeconds(t)).phase).toBe('arrived');
+    expect(frameAt(m, t, totalSeconds(t) - 0.01).phase).not.toBe('arrived');
     expect(frameAt(m, t, 1e6).day).toBeCloseTo(m.arrivalDay, 6);
+  });
+
+  it.each(['mercure', 'mars', 'neptune'])('%s : la scène de départ dure 3 s et s’enchaîne sans à-coup', (id) => {
+    const m = planMission(planetById(id)!, NOW);
+    const t = timing(m);
+    expect(DEPART_SECONDS).toBe(3);
+    expect(frameAt(m, t, t.window + 0.01).phase).toBe('depart');
+    expect(frameAt(m, t, t.window + 2.99).phase).toBe('depart');
+    expect(frameAt(m, t, t.window + 3.01).phase).not.toBe('depart');
+    // Même vitesse juste avant et juste après la fin du départ.
+    const h = 1e-3;
+    const at = (e: number) => frameAt(m, t, t.window + e).s;
+    const before = (at(3) - at(3 - h)) / h;
+    const after = (at(3 + h) - at(3)) / h;
+    expect(after).toBeCloseTo(before, 2);
+    expect(at(3)).toBeCloseTo(t.departEnd, 6);
   });
 
   it('les longs trajets durent plus longtemps à l’écran', () => {
