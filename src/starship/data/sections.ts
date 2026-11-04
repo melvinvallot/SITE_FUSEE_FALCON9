@@ -321,10 +321,10 @@ export const SECTIONS: readonly PageSection[] = [
     chapter: 'au-dela',
     eyebrow: 'Orbite lunaire',
     title: 'Freinage au-dessus de la Lune',
-    lead: 'Sans atmosphère pour freiner, tout se fait au moteur. Le vaisseau lunaire, sans bouclier thermique ni volets, se place en orbite autour de la Lune, puis rallume ses Raptor pour casser sa vitesse et entamer la descente.',
+    lead: 'Sans atmosphère pour freiner, tout se fait au moteur. Le vaisseau se place en orbite autour de la Lune, puis rallume ses Raptor pour casser sa vitesse et entamer la descente.',
     align: 'start',
     points: [
-      'La NASA a retenu cette version de Starship pour poser des astronautes sur la Lune, avec le programme Artemis.',
+      'La NASA a retenu une version lunaire de Starship pour poser des astronautes sur la Lune, avec le programme Artemis.',
       'Pour emporter assez d’ergols, il doit d’abord être ravitaillé en orbite terrestre par plusieurs vaisseaux.',
     ],
   },
@@ -333,7 +333,7 @@ export const SECTIONS: readonly PageSection[] = [
     chapter: 'au-dela',
     eyebrow: 'Pôle Sud de la Lune',
     title: 'Alunissage',
-    lead: 'Dans les derniers mètres, les Raptor se taisent et des propulseurs placés haut sur la coque prennent le relais : leur souffle reste loin du sol et soulève moins de poussière. Le vaisseau se pose sur ses jambes, prêt à décharger.',
+    lead: 'Redressé, le vaisseau rallume ses Raptor pour la descente finale et ralentit jusqu’à quasiment l’arrêt. Il se pose sur ses jambes dans un nuage de poussière, prêt à décharger.',
     align: 'end',
     specs: [
       { label: 'Vols cargo vers la Lune', value: 'Au plus tôt en 2028' },

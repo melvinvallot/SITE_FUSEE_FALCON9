@@ -38,10 +38,8 @@ export interface LandingPose {
   y: number;
   /** Inclinaison autour de z : π/2 = couché (moteurs vers l'avant, freinage), 0 = debout. */
   tilt: number;
-  /** Moteurs Raptor principaux (freinage en orbite puis descente). */
+  /** Moteurs Raptor : freinage en orbite, puis rallumage pour la descente finale, coupés au contact. */
   main: number;
-  /** Propulseurs d'atterrissage placés haut sur la coque (fin de descente). */
-  thrusters: number;
   /** Nuage de poussière soulevé près du sol (0..1). */
   dust: number;
 }
@@ -59,8 +57,7 @@ export function landing(land: number): LandingPose {
     x: lerp(lerp(-70, -3, glide), 0, final),
     y: lerp(lerp(LANDING_START_Y, 14, glide), 0, final),
     tilt: (Math.PI / 2) * (1 - smoothstep((t - 0.2) / 0.38)),
-    main: bump(t, 0.04, 0.6),
-    thrusters: bump(t, 0.5, 1),
+    main: Math.max(bump(t, 0.04, 0.6), bump(t, 0.52, 1)),
     // La poussière se soulève à l'approche du sol puis retombe une fois posé.
     dust: bump(t, 0.6, 1),
   };

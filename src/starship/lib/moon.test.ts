@@ -52,15 +52,14 @@ describe('voyage vers la Lune', () => {
     expect(end.advance).toBeGreaterThan(10);
   });
 
-  it('alunissage : freinage couché, redressement, puis posé moteurs coupés', () => {
+  it('alunissage : freinage couché, redressement, rallumage final, puis posé moteurs coupés', () => {
     const start = landing(0);
     expect(start.y).toBe(LANDING_START_Y);
     expect(start.tilt).toBeCloseTo(Math.PI / 2);
     expect(landing(0.3).main).toBeGreaterThan(0.5);
-    expect(landing(0.8).thrusters).toBeGreaterThan(0.5);
-    expect(landing(0.8).main).toBe(0);
+    expect(landing(0.8).main).toBeGreaterThan(0.5);
     const end = landing(1);
-    expect(end).toMatchObject({ x: 0, y: 0, tilt: 0, main: 0, thrusters: 0, dust: 0 });
+    expect(end).toMatchObject({ x: 0, y: 0, tilt: 0, main: 0, dust: 0 });
   });
 
   it('la descente est continue et ne remonte jamais', () => {
