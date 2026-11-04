@@ -25,11 +25,11 @@ test.describe('Page Starship', () => {
 
   test('toutes les sections sont présentes avec leur titre', async ({ page }) => {
     await expect(page.locator('main section')).toHaveCount(SECTIONS.length);
-    for (const s of SECTIONS) {
-      const section = page.locator(`section#${s.id}`);
-      await expect(section).toHaveCount(1);
-      await expect(section.getByRole('heading').first()).toBeAttached();
-    }
+    // Une seule lecture de la page : la scène 3D rend chaque aller-retour lent sans carte graphique.
+    const found = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('main section'), (el) => ({ id: el.id, heading: !!el.querySelector('h1, h2') })),
+    );
+    expect(found).toEqual(SECTIONS.map((s) => ({ id: s.id, heading: true })));
     await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/starship/i);
   });
 

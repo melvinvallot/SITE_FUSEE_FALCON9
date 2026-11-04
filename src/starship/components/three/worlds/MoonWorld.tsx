@@ -136,7 +136,7 @@ export function MoonWorld({ reducedMotion = false }: { reducedMotion?: boolean }
       </instancedMesh>
       <points geometry={dust} material={dustMaterial} frustumCulled={false} />
       <group position={EARTH_POSITION}>
-        <Earth radius={46} sun={MOON_SUN} latitude={20} longitude={-20} />
+        <Earth radius={46} sun={MOON_SUN} latitude={20} longitude={-20} segments={96} />
       </group>
       {/* Vaisseau lunaire : pivot à la base des moteurs, couché pendant le freinage (nez vers -x). */}
       <group ref={ship}>
