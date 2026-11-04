@@ -1,4 +1,4 @@
-/** Bruit de valeur 2D déterministe et somme fractale, pour le relief martien. */
+/** Bruit de valeur 2D déterministe et somme fractale, pour les reliefs (sol lunaire). */
 const hash = (x: number, y: number): number => {
   const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
   return s - Math.floor(s);
@@ -28,17 +28,4 @@ export function fbm2(x: number, y: number, octaves = 5): number {
     amp *= 0.5;
   }
   return sum;
-}
-
-/**
- * Altitude du terrain : plat autour de la zone d'atterrissage, dunes et
- * collines au-delà, reliefs plus marqués à l'horizon.
- */
-export function marsHeight(x: number, z: number): number {
-  const d = Math.hypot(x, z);
-  const flat = Math.min(1, Math.max(0, (d - 9) / 25));
-  const hills = (fbm2(x * 0.02, z * 0.02) - 0.5) * 22;
-  const dunes = (fbm2(x * 0.09 + 10, z * 0.09) - 0.5) * 3;
-  const far = Math.max(0, (d - 90) / 120) * 30 * fbm2(x * 0.01 + 3, z * 0.01);
-  return (hills + dunes) * flat + far;
 }

@@ -5,11 +5,12 @@
 Trois pages en React + TypeScript, reliées par un menu commun :
 
 - **Falcon 9, pièce par pièce** (`index.html`) : la fusée se démonte au fil du défilement.
-- **Starship, de la pointe aux moteurs** (`starship.html`) : 25 écrans en 5 chapitres. Vue éclatée,
+- **Starship, de la pointe aux moteurs** (`starship.html`) : 28 écrans en 5 chapitres. Vue éclatée,
   coupe des réservoirs, bouclier thermique et plasma de rentrée, 39 moteurs Raptor dont un en gros plan,
   tour de lancement, décollage, séparation à chaud dans la mésosphère (échelle des couches de
   l'atmosphère), retour du propulseur en quatre étapes jusqu'à sa capture par la tour,
-  ravitaillement en orbite au-dessus de la Terre, puis arrivée sur Mars.
+  ravitaillement en orbite au-dessus de la Terre, largages de satellites des vols 10 à 14 (on choisit
+  le vol à rejouer), puis voyage vers la Lune : départ de l'orbite terrestre, freinage et alunissage.
 - **Starship vers les planètes** (`planetes.html`) : combien de temps pour aller de la Terre à chaque
   planète. On choisit une destination ; la 3D attend la prochaine fenêtre de tir, suit Starship sur son
   ellipse de transfert puis le met en orbite. Durées estimées par un transfert de Hohmann (orbites
@@ -99,7 +100,7 @@ licence CC BY 4.0, d'après les données de la NASA.
 - `src/starship/` : page Starship
   - `data/` : contenu des sections, chapitres, images clés, jauge, télémétrie, cotes du modèle
   - `lib/` : logique pure testée (timeline, séquence de vol, télémétrie, progression par section)
-  - `components/three/` : scène 3D (pièces, tour, Terre, Mars, effets)
+  - `components/three/` : scène 3D (pièces, tour, Terre, largages, Lune, effets)
   - `components/ui/` : interface (chapitres, jauge, compteurs, comparaisons, télémétrie)
 
 Pour ajouter un écran à Starship : une entrée dans `src/starship/data/sections.ts` et une image clé au

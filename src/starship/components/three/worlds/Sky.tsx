@@ -4,6 +4,7 @@ import { BackSide, Color, ShaderMaterial, Vector3, type Mesh } from 'three';
 import { clamp } from '../../../../lib/math';
 import { useSceneState } from '../SceneStateContext';
 import { SUN_DIRECTION } from './OrbitWorld';
+import { MOON_SUN } from './MoonWorld';
 
 const SKY_SUN = new Vector3(0.6, 0.25, -0.75);
 
@@ -81,8 +82,13 @@ const fragmentShader = /* glsl */ `
 const SKIES = [
   { top: '#03060d', horizon: '#18304f', bottom: '#070b12', sun: '#000000' },
   { top: '#000000', horizon: '#02040a', bottom: '#000000', sun: '#fff3dc' },
-  { top: '#1f1614', horizon: '#9c6744', bottom: '#4a2e20', sun: '#2c3a55' },
+  { top: '#000000', horizon: '#02040a', bottom: '#000000', sun: '#fff3dc' },
+  // Lune : pas d'atmosphère, ciel noir en plein jour.
+  { top: '#000000', horizon: '#010102', bottom: '#000000', sun: '#fff8ee' },
 ] as const;
+
+/** Halo autour du Soleil, par décor : seulement dans l'air du pas de tir. */
+const HAZE = [1, 0, 0, 0] as const;
 
 /** Dôme de ciel centré sur la caméra, qui s'assombrit avec l'altitude. */
 export function Sky() {
@@ -114,8 +120,8 @@ export function Sky() {
 
   useFrame(({ camera }) => {
     mesh.current?.position.copy(camera.position);
-    const env = clamp(state.current.env, 0, 2);
-    const i = Math.min(1, Math.floor(env));
+    const env = clamp(state.current.env, 0, SKIES.length - 1);
+    const i = Math.min(SKIES.length - 2, Math.floor(env));
     const t = env - i;
     const a = palette[i]!;
     const b = palette[i + 1]!;
@@ -126,9 +132,8 @@ export function Sky() {
     (u.uSunColor!.value as Color).copy(a.sun).lerp(b.sun, t);
     // En montant, le ciel nocturne cède la place au noir de l'espace et au limbe terrestre.
     // En orbite, pas d'air pour diffuser la lumière : seul le disque solaire reste, dans l'axe de l'éclairage.
-    const space = 1 - Math.abs(env - 1);
-    u.uHaze!.value = 1 - clamp(space * 2);
-    (u.uSunDir!.value as Vector3).copy(env > 0.5 && env < 1.5 ? SUN_DIRECTION : SKY_SUN);
+    u.uHaze!.value = HAZE[i]! + (HAZE[i + 1]! - HAZE[i]!) * clamp(t * 2);
+    (u.uSunDir!.value as Vector3).copy(env < 0.5 ? SKY_SUN : env < 2.5 ? SUN_DIRECTION : MOON_SUN);
     u.uAlt!.value = clamp(state.current.alt) * clamp(1 - env);
   });
 

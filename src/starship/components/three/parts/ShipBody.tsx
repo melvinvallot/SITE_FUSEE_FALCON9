@@ -8,6 +8,7 @@ import { useMaterials } from '../materials';
 import { Flap } from '../primitives/Flap';
 import { TankSection } from '../primitives/TankSection';
 import { Frost } from '../primitives/Frost';
+import { useShipVariant } from '../ShipVariant';
 import { useSceneState } from '../SceneStateContext';
 import { Kit, useKits } from '../detail';
 import { ShipDetails, hingeCover } from './ShipDetails';
@@ -19,11 +20,14 @@ const DOOR_Y = 26.0;
 const DOOR_H = 0.95;
 const DOOR_ARC = 1.1;
 const SATELLITES = 6;
+/** Hauteur de la trappe de largage, partagée avec les décors qui larguent des satellites. */
+export const PAYLOAD_DOOR_Y = DOOR_Y;
 
 /** Fût du vaisseau : réservoirs, bouclier thermique, volets arrière et soute. */
-export function ShipBody() {
+export function ShipBody({ door: doorOverride }: { door?: () => number } = {}) {
   const m = useMaterials();
   const state = useSceneState();
+  const variant = useShipVariant();
   const flaps = useRef<(Group | null)[]>([]);
   const door = useRef<Group>(null);
   const sats = useRef<(Group | null)[]>([]);
@@ -52,7 +56,7 @@ export function ShipBody() {
     const t = clock.elapsedTime;
     const swing = s.flaps * Math.sin(t * 1.3) * 0.45 + s.pitch * 0.25;
     flaps.current.forEach((f, i) => f?.rotation.set(0, (i ? -1 : 1) * swing, 0));
-    door.current?.position.set(0, s.door * (DOOR_H + 0.05), 0);
+    door.current?.position.set(0, (doorOverride ? doorOverride() : s.door) * (DOOR_H + 0.05), 0);
     sats.current.forEach((g, i) => {
       const p = clamp(s.door * 1.5 - i * 0.09);
       g?.position.set(Math.sin(i * 1.7) * 0.25 * p, (i - SATELLITES / 2) * 0.1 + p * i * 0.12, -(RADIUS - 0.35) - p * (2.2 + i * 0.75));
@@ -65,7 +69,7 @@ export function ShipBody() {
       <mesh geometry={geo.barrel} material={m.steel} position={[0, base + H / 2, 0]} />
       <Frost bottom={19.2} top={22.3} thetaStart={Math.PI * 0.62} thetaLength={Math.PI * 0.76} />
       <Frost bottom={22.65} top={24.45} thetaStart={Math.PI * 0.62} thetaLength={Math.PI * 0.76} />
-      <mesh geometry={geo.shield} material={m.tiles} position={[0, base + 0.3 + (H - 0.3) / 2, 0]} />
+      {variant.shield && <mesh geometry={geo.shield} material={m.tiles} position={[0, base + 0.3 + (H - 0.3) / 2, 0]} />}
       {/* Fonds : dôme arrière et cloison sous le nez (visibles en vue éclatée). */}
       <mesh material={m.cavity} position={[0, base + 0.95, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <circleGeometry args={[RADIUS - 0.01, 48]} />
@@ -79,7 +83,7 @@ export function ShipBody() {
       </mesh>
       <ShipDetails m={m} />
       {/* Volets arrière, sur la frontière entre tuiles et acier. */}
-      {[1, -1].map((side, i) => (
+      {variant.flaps && [1, -1].map((side, i) => (
         <group key={side} position={[side * RADIUS, base + 0.55, 0]} scale={[side, 1, 1]}>
           {/* Carénage de la charnière et de ses moteurs électriques, côté sous le vent. */}
           <mesh geometry={covers.steel} material={m.steel} />
@@ -93,7 +97,7 @@ export function ShipBody() {
       <group ref={door}>
         <mesh geometry={geo.door} material={m.steel} position={[0, DOOR_Y, 0]} />
       </group>
-      {Array.from({ length: SATELLITES }, (_, i) => (
+      {variant.payload && Array.from({ length: SATELLITES }, (_, i) => (
         <group key={i} ref={(g) => (sats.current[i] = g)}>
           <group position={[0, DOOR_Y, 0]}>
             <mesh material={m.panel} position={[0, 0, 0]}>

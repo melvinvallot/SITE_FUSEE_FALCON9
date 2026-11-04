@@ -25,11 +25,11 @@ test.describe('Page Starship', () => {
 
   test('toutes les sections sont présentes avec leur titre', async ({ page }) => {
     await expect(page.locator('main section')).toHaveCount(SECTIONS.length);
-    for (const s of SECTIONS) {
-      const section = page.locator(`section#${s.id}`);
-      await expect(section).toHaveCount(1);
-      await expect(section.getByRole('heading').first()).toBeAttached();
-    }
+    // Une seule lecture de la page : la scène 3D rend chaque aller-retour lent sans carte graphique.
+    const found = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('main section'), (el) => ({ id: el.id, heading: !!el.querySelector('h1, h2') })),
+    );
+    expect(found).toEqual(SECTIONS.map((s) => ({ id: s.id, heading: true })));
     await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/starship/i);
   });
 
@@ -130,6 +130,27 @@ test.describe('Page Starship', () => {
     await expect(director(page)).toHaveAttribute('data-mode', 'launch');
     await page.getByRole('button', { name: 'Arrêter' }).click();
     await expect(director(page)).toHaveAttribute('data-mode', 'idle');
+  });
+
+  test('largages : choisir un vol affiche sa charge et rejoue le largage', async ({ page }) => {
+    await scrollToSection(page, 'deploiements');
+    await expect(activeSection(page)).toHaveAttribute('id', 'deploiements');
+    const section = page.locator('section#deploiements');
+    await expect(section.getByRole('radio', { name: /Vol 14/ })).toHaveAttribute('aria-checked', 'true');
+    await section.getByRole('radio', { name: /Vol 10/ }).click();
+    await expect(section.getByRole('radio', { name: /Vol 10/ })).toHaveAttribute('aria-checked', 'true');
+    await expect(section.getByText('8 simulateurs de satellites Starlink')).toBeVisible();
+    await section.getByRole('button', { name: 'Rejouer le largage' }).click();
+    await expect(activeSection(page)).toHaveAttribute('id', 'deploiements');
+    await expectCanvasNotBlack(page);
+  });
+
+  test('voyage vers la Lune : départ, freinage et alunissage', async ({ page }) => {
+    for (const id of ['depart-lune', 'arrivee-lune', 'alunissage']) {
+      await scrollToSection(page, id);
+      await expect(activeSection(page)).toHaveAttribute('id', id);
+      await expectCanvasNotBlack(page);
+    }
   });
 
   test('fin de page : « Revenir au début » et lien vers Falcon 9', async ({ page }) => {

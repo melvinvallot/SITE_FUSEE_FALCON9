@@ -1597,3 +1597,146 @@ body {
     max-width: min(30rem, calc(100% - 2rem));
   }
 }
+
+/* ---------- Largages : choix du vol ---------- */
+.deploy {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.4rem;
+  max-width: 34rem;
+}
+
+.deploy__flights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.deploy__flight {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 4.6rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.7rem;
+  background: rgba(11, 18, 27, 0.55);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    color 0.2s;
+}
+
+.deploy__flight:hover {
+  border-color: var(--title);
+}
+
+.deploy__flight[aria-checked='true'] {
+  border-color: var(--hot);
+  background: rgba(255, 107, 44, 0.16);
+  color: var(--title);
+}
+
+.deploy__flight-name {
+  font: 600 1.05rem / 1 var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+.deploy__flight-count {
+  font: 500 0.72rem / 1 var(--font-mono);
+  color: var(--muted);
+}
+
+.deploy__flight[aria-checked='true'] .deploy__flight-count {
+  color: var(--hot-soft);
+}
+
+.deploy__card {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: rgba(5, 8, 13, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.deploy__card p {
+  margin: 0;
+}
+
+.deploy__date {
+  font: 500 0.78rem / 1.2 var(--font-mono);
+  color: var(--hot-soft);
+  letter-spacing: 0.04em;
+}
+
+.deploy__payload {
+  margin-top: 0.35rem !important;
+  font-weight: 600;
+  color: var(--title);
+}
+
+.deploy__note {
+  margin-top: 0.4rem !important;
+  font-size: var(--step--1);
+  line-height: 1.5;
+}
+
+.deploy__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.6rem !important;
+  font: 500 0.75rem / 1 var(--font-mono);
+  color: var(--muted);
+}
+
+.deploy__swatch {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-right: 0.3rem;
+  vertical-align: -0.1rem;
+  border-radius: 2px;
+}
+
+.deploy__swatch--sim {
+  background: #8a8e93;
+}
+
+.deploy__swatch--v3 {
+  background: linear-gradient(90deg, #1c2b4f 0 35%, #c9a04f 35% 65%, #1c2b4f 65%);
+}
+
+.deploy__replay {
+  justify-self: start;
+  padding: 0.7rem 1.1rem;
+  font-size: var(--step--1);
+}
+
+@media (max-width: 720px) {
+  .deploy__flights {
+    flex-wrap: nowrap;
+  }
+
+  .deploy__flight {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.45rem 0.35rem;
+    text-align: center;
+  }
+
+  .deploy__flight-count {
+    display: none;
+  }
+
+  .deploy__card {
+    padding: 0.7rem 0.85rem;
+  }
+
+  .deploy__note {
+    display: none;
+  }
+}

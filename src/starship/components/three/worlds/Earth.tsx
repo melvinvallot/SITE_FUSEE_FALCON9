@@ -127,12 +127,26 @@ const atmosphereFragment = /* glsl */ `
   }
 `;
 
+/**
+ * Cartes partagées par toutes les Terres de la page (orbite, largages, ciel lunaire) :
+ * chargées une seule fois, gardées tant que la page est ouverte.
+ */
+const cache = new Map<string, { tex: Texture; ready: Promise<void> }>();
+
 const loadTexture = (url: string, srgb: boolean, onLoad: () => void): Texture => {
-  const tex = new TextureLoader().load(url, onLoad);
-  tex.colorSpace = srgb ? SRGBColorSpace : NoColorSpace;
-  tex.anisotropy = 8;
-  tex.minFilter = LinearMipmapLinearFilter;
-  return tex;
+  let entry = cache.get(url);
+  if (!entry) {
+    let done!: () => void;
+    const ready = new Promise<void>((r) => (done = r));
+    const tex = new TextureLoader().load(url, () => done());
+    tex.colorSpace = srgb ? SRGBColorSpace : NoColorSpace;
+    tex.anisotropy = 8;
+    tex.minFilter = LinearMipmapLinearFilter;
+    entry = { tex, ready };
+    cache.set(url, entry);
+  }
+  void entry.ready.then(onLoad);
+  return entry.tex;
 };
 
 interface EarthProps {
@@ -142,6 +156,8 @@ interface EarthProps {
   latitude: number;
   longitude: number;
   up?: Vector3;
+  /** Finesse du globe (segments en longitude) : moins pour une Terre lointaine. */
+  segments?: number;
 }
 
 /** Direction d'un point (lat, lon) dans le repère d'une `SphereGeometry` de three.js. */
@@ -155,7 +171,7 @@ export function latLonToVector(latitude: number, longitude: number): Vector3 {
  * Terre très détaillée : cartes photographiques en 4K, relief, reflet du Soleil
  * sur les océans, nuages et leur ombre, villes éclairées côté nuit, atmosphère.
  */
-export function Earth({ radius, sun, latitude, longitude, up = new Vector3(0, 1, 0) }: EarthProps) {
+export function Earth({ radius, sun, latitude, longitude, up = new Vector3(0, 1, 0), segments = 256 }: EarthProps) {
   const spin = useRef<Group>(null);
   const ready = useRef(0);
   const loaded = useRef(0);
@@ -189,7 +205,7 @@ export function Earth({ radius, sun, latitude, longitude, up = new Vector3(0, 1,
 
   useEffect(
     () => () => {
-      for (const key of ['uDay', 'uNight', 'uDetail'] as const) (surface.uniforms[key]!.value as Texture).dispose();
+      // Les cartes sont partagées (voir `cache`) : seules les matières sont libérées.
       surface.dispose();
       atmosphere.dispose();
     },
@@ -209,11 +225,11 @@ export function Earth({ radius, sun, latitude, longitude, up = new Vector3(0, 1,
     <group quaternion={orientation}>
       <group ref={spin}>
         <mesh material={surface}>
-          <sphereGeometry args={[radius, 256, 128]} />
+          <sphereGeometry args={[radius, segments, segments / 2]} />
         </mesh>
       </group>
       <mesh material={atmosphere} scale={1.025}>
-        <sphereGeometry args={[radius, 128, 64]} />
+        <sphereGeometry args={[radius, segments / 2, segments / 4]} />
       </mesh>
     </group>
   );
