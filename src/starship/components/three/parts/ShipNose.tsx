@@ -5,6 +5,7 @@ import { LAYOUT, RADIUS } from '../../../data/layout';
 import { CutawayView } from '../CutawayView';
 import { useMaterials } from '../materials';
 import { Flap } from '../primitives/Flap';
+import { useShipVariant } from '../ShipVariant';
 import { useSceneState } from '../SceneStateContext';
 import { FINE, Kit, useKits } from '../detail';
 import { RING_PITCH, hingeCover, rcsPod } from './ShipDetails';
@@ -72,21 +73,22 @@ export function ShipNose() {
     flaps.current.forEach((f) => f?.rotation.set(0, swing, 0));
   });
 
+  const variant = useShipVariant();
   const flapBase = 0.15;
   const lean = Math.atan2(RADIUS - noseRadius(0.5), H * 0.5);
 
   return (
     <group position={[0, barrelTop, 0]}>
       <mesh geometry={geo.shell} material={m.steel} />
-      <mesh geometry={geo.shield} material={m.tiles} />
+      {variant.shield && <mesh geometry={geo.shield} material={m.tiles} />}
       <mesh geometry={kits.steel} material={m.steel} />
       <mesh geometry={kits.sooty} material={m.sooty} />
       <mesh geometry={kits.cavity} material={m.hole} />
-      <mesh geometry={kits.tiles} material={m.tiles} />
+      {variant.shield && <mesh geometry={kits.tiles} material={m.tiles} />}
       <mesh material={m.sooty} position={[0, 0.01, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <circleGeometry args={[RADIUS - 0.01, 48]} />
       </mesh>
-      {[1, -1].map((side, i) => (
+      {variant.flaps && [1, -1].map((side, i) => (
         <group
           key={side}
           position={[side * noseRadius(flapBase / H), flapBase, 0]}

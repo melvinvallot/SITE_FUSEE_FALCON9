@@ -17,6 +17,8 @@ const DEFAULTS: Scalars = {
   sep: 0,
   capture: 0,
   refuel: 0,
+  tli: 0,
+  land: 0,
   env: 0,
   sway: 0,
   alt: 0,
@@ -75,6 +77,12 @@ export const KEYFRAMES: readonly Keyframe[] = [
   frame('capture', [22, 7, 60], [-11, 12, 0], null, { ...landed, site: 1 }),
 
   frame('ravitaillement', [-10, 26, 64], [15, 12, 0], null, { ...landed, env: 1, refuel: 1, fov: 34, sway: 0.6 }),
-  frame('destinations', [12, 5, 42], [-7, 10, 0], null, { ...landed, env: 2, sway: 0.5 }),
-  frame('fin', [-32, 12, 72], [11, 9, 0], null, { ...landed, env: 2, sway: 1 }),
+  // Largages de satellites (animation lancée par le sélecteur), puis départ vers la Lune au défilement.
+  // Dans ces décors, la caméra suit le vaisseau : positions relatives à lui (voir shipFollow).
+  frame('deploiements', [-4, 15, 52], [-19, 11, 0], null, { ...landed, env: 2, fov: 34, sway: 0.4 }),
+  frame('depart-lune', [-44, 22, 30], [6, 12, -3], null, { ...landed, env: 2, tli: 1, fov: 38 }),
+  // Arrivée en orbite lunaire, puis descente jusqu'au sol.
+  frame('arrivee-lune', [-4, 10, 44], [-17, 0, 0], null, { ...landed, env: 3, fov: 36 }),
+  frame('alunissage', [-16, 6, 44], [11, 9, 0], null, { ...landed, env: 3, land: 1, sway: 0.4 }),
+  frame('fin', [30, 12, 70], [-12, 10, 0], null, { ...landed, env: 3, land: 1, sway: 1 }),
 ];

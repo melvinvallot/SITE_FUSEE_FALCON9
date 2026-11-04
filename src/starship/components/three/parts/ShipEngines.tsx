@@ -11,7 +11,13 @@ const SEA = ring(3, 0.32, Math.PI / 2);
 const VAC = ring(3, 0.74, Math.PI / 2 + Math.PI / 3);
 
 /** Moteurs du vaisseau : trois Raptor au centre, trois Raptor Vacuum autour. */
-export function ShipEngines({ flames = true }: { flames?: boolean }) {
+interface ShipEnginesProps {
+  flames?: boolean;
+  /** Poussée imposée (vaisseau de décor) ; par défaut, celle de la séquence de lancement. */
+  thrust?: () => number;
+}
+
+export function ShipEngines({ flames = true, thrust }: ShipEnginesProps) {
   const m = useMaterials();
   const state = useSceneState();
   const nozzles = useMemo(() => [...SEA, ...VAC], []);
@@ -35,7 +41,7 @@ export function ShipEngines({ flames = true }: { flames?: boolean }) {
             nozzleRadius={0.2}
             radius={0.95}
             length={7}
-            intensity={() => shipThrust(state.current.sep, state.current.capture)}
+            intensity={thrust ?? (() => shipThrust(state.current.sep, state.current.capture))}
             spread={() => 1}
             light={0}
           />

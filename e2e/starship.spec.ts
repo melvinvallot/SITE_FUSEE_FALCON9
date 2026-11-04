@@ -132,6 +132,27 @@ test.describe('Page Starship', () => {
     await expect(director(page)).toHaveAttribute('data-mode', 'idle');
   });
 
+  test('largages : choisir un vol affiche sa charge et rejoue le largage', async ({ page }) => {
+    await scrollToSection(page, 'deploiements');
+    await expect(activeSection(page)).toHaveAttribute('id', 'deploiements');
+    const section = page.locator('section#deploiements');
+    await expect(section.getByRole('radio', { name: /Vol 14/ })).toHaveAttribute('aria-checked', 'true');
+    await section.getByRole('radio', { name: /Vol 10/ }).click();
+    await expect(section.getByRole('radio', { name: /Vol 10/ })).toHaveAttribute('aria-checked', 'true');
+    await expect(section.getByText('8 simulateurs de satellites Starlink')).toBeVisible();
+    await section.getByRole('button', { name: 'Rejouer le largage' }).click();
+    await expect(activeSection(page)).toHaveAttribute('id', 'deploiements');
+    await expectCanvasNotBlack(page);
+  });
+
+  test('voyage vers la Lune : départ, freinage et alunissage', async ({ page }) => {
+    for (const id of ['depart-lune', 'arrivee-lune', 'alunissage']) {
+      await scrollToSection(page, id);
+      await expect(activeSection(page)).toHaveAttribute('id', id);
+      await expectCanvasNotBlack(page);
+    }
+  });
+
   test('fin de page : « Revenir au début » et lien vers Falcon 9', async ({ page }) => {
     const last = SECTIONS[SECTIONS.length - 1]!;
     await scrollToSection(page, last.id);
