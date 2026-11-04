@@ -1,4 +1,5 @@
 import { BOOSTER_PIVOT, CATCH_BASE, LAUNCH_ALTITUDE, toWorld } from '../data/layout';
+import { KEYFRAMES } from '../data/keyframes';
 import type { Keyframe, Scalars } from '../types';
 import { SCALAR_KEYS } from '../types';
 import { stage, armsClosure, boosterPose, boosterThrust, bump, ignition, IGNITION_SHARE, launchLift, shipLift, shipThrust } from './flight';
@@ -72,6 +73,21 @@ describe('vol', () => {
     expect(caught.angle).toBeCloseTo(0);
     expect(armsClosure(1)).toBe(1);
     expect(armsClosure(0.5)).toBe(0);
+  });
+
+  it('pose le propulseur une seule fois, sans rebond, jusqu’à la fin du défilement', () => {
+    const start = KEYFRAMES.findIndex((k) => k.sectionId === 'atterrissage');
+    const n = KEYFRAMES.length - 1;
+    let previous = Infinity;
+    for (let p = start / n; p <= 1; p += 0.0005) {
+      const s = sampleTimeline(KEYFRAMES, p);
+      if (s.env >= 0.5) break; // le pas de tir n'est plus affiché
+      const y = boosterPose(s.launch, s.sep, s.capture).y;
+      expect(y).toBeLessThanOrEqual(previous + 1e-9);
+      expect(y).toBeGreaterThanOrEqual(CATCH_BASE + BOOSTER_PIVOT - 1e-9);
+      previous = y;
+    }
+    expect(previous).toBeCloseTo(CATCH_BASE + BOOSTER_PIVOT);
   });
 
   it('enchaîne les allumages des deux étages', () => {

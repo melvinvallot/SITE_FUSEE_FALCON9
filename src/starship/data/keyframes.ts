@@ -38,6 +38,13 @@ const exploded: Partial<Scalars> = { explode: 1 };
  * caméra est décalée pour placer la fusée du côté opposé au texte.
  * Pendant l'ascension, les positions sont relatives à l'altitude atteinte.
  */
+/**
+ * Après la capture, le vol reste terminé : sans cela, le passage vers l'orbite
+ * ramènerait capture, sep et launch à 0 et le propulseur, encore visible pendant
+ * la première moitié du fondu, remonterait avant de disparaître.
+ */
+const landed: Partial<Scalars> = { launch: 1, sep: 1, capture: 1 };
+
 export const KEYFRAMES: readonly Keyframe[] = [
   frame('accueil', [26, 6, 64], [-12.5, 14, 0], null, { site: 1, sway: 1 }),
   frame('echelle', [-14, 9, 62], [13, 13, 0], null, { site: 1, compare: 1, sway: 0.5 }),
@@ -64,9 +71,9 @@ export const KEYFRAMES: readonly Keyframe[] = [
   frame('retour', [-24, 19, 76], [11, 9, 0], null, { site: 1, launch: 1, sep: 1, capture: 0.3, alt: 0.9 }),
   frame('descente', [27, 2, 68], [-10, 11, 0], null, { site: 1, launch: 1, sep: 1, capture: 0.6, alt: 0.45, fins: 1 }),
   frame('atterrissage', [-19, 4, 52], [8, 10, 0], null, { site: 1, launch: 1, sep: 1, capture: 0.86, alt: 0.04 }),
-  frame('capture', [22, 7, 60], [-11, 12, 0], null, { site: 1, launch: 1, sep: 1, capture: 1 }),
+  frame('capture', [22, 7, 60], [-11, 12, 0], null, { ...landed, site: 1 }),
 
-  frame('ravitaillement', [-10, 26, 64], [15, 12, 0], null, { env: 1, refuel: 1, fov: 34, sway: 0.6 }),
-  frame('destinations', [12, 5, 42], [-7, 10, 0], null, { env: 2, sway: 0.5 }),
-  frame('fin', [-32, 12, 72], [11, 9, 0], null, { env: 2, sway: 1 }),
+  frame('ravitaillement', [-10, 26, 64], [15, 12, 0], null, { ...landed, env: 1, refuel: 1, fov: 34, sway: 0.6 }),
+  frame('destinations', [12, 5, 42], [-7, 10, 0], null, { ...landed, env: 2, sway: 0.5 }),
+  frame('fin', [-32, 12, 72], [11, 9, 0], null, { ...landed, env: 2, sway: 1 }),
 ];
