@@ -8,6 +8,7 @@ import { Plume } from '../primitives/Plume';
 import { Raptor, ring } from '../primitives/Raptor';
 import { RaptorShowcase } from '../primitives/RaptorShowcase';
 import { useSceneState } from '../SceneStateContext';
+import { Kit, useKits } from '../detail';
 
 const MOUNT_Y = 0.45;
 const CENTER = ring(3, 0.2, Math.PI / 6);
@@ -25,6 +26,16 @@ export function BoosterEngines({ reducedMotion = false }: { reducedMotion?: bool
   const all = useMemo(() => [...CENTER, ...INNER, ...OUTER], []);
   const steerable = useMemo(() => [...CENTER, ...INNER], []);
   const [fx, fz] = CENTER[0]!;
+
+  // Colliers de protection thermique autour des 20 moteurs fixes de la couronne.
+  const collars = useKits(() => {
+    const k = new Kit();
+    for (const [x, z] of OUTER) {
+      k.cyl(0.082, 0.09, 0.12, [x, 0.24, z], [0, 0, 0], 20, true);
+      k.ring(0.088, 0.008, 0.18, Math.PI * 2, 0, 20, x, z);
+    }
+    return { sooty: k.build() };
+  });
 
   useFrame(({ clock }) => {
     const k = smoothstep(state.current.raptor);
@@ -51,6 +62,7 @@ export function BoosterEngines({ reducedMotion = false }: { reducedMotion?: bool
           ),
         )}
       </group>
+      <mesh geometry={collars.sooty} material={m.sooty} />
       <group ref={showcase}>
         <RaptorShowcase materials={m} />
       </group>

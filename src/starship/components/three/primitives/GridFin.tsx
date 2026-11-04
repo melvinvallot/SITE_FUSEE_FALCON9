@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { BoxGeometry } from 'three';
+import { BoxGeometry, CylinderGeometry } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { MaterialSet } from '../materials';
 
@@ -32,6 +32,14 @@ export function GridFin({ materials, span = 1.1, width = 0.9, depth = 0.12 }: Gr
     add(span, depth, t * 3, span / 2, 0, -width / 2);
     add(t * 3, depth, width, span, 0, 0);
     add(t * 4, depth * 1.2, width, 0.02, 0, 0);
+    // Arbre de la charnière et ferrure d'emplanture.
+    const shaft = new CylinderGeometry(0.035, 0.035, 0.3, 14);
+    shaft.rotateZ(Math.PI / 2);
+    shaft.translate(0.02, 0, 0);
+    boxes.push(shaft as unknown as BoxGeometry);
+    add(0.12, depth * 1.5, width * 0.32, 0.07, 0, 0);
+    // Raidisseur transversal à mi-portée.
+    add(t * 2.5, depth * 1.05, width, span * 0.5, 0, 0);
     // Alvéoles en losange : deux familles de lames à ±45°, rognées au cadre.
     const cells = 8;
     for (const sign of [1, -1]) {
@@ -64,9 +72,6 @@ export function GridFin({ materials, span = 1.1, width = 0.9, depth = 0.12 }: Gr
   return (
     <group>
       <mesh geometry={geometry} material={materials.grid} />
-      <mesh material={materials.sooty} position={[-0.08, 0, 0]}>
-        <boxGeometry args={[0.18, 0.22, 0.3]} />
-      </mesh>
     </group>
   );
 }

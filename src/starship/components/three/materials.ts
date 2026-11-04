@@ -30,6 +30,10 @@ const RECIPES = {
   tiles: { color: '#ffffff', roughness: 0.82, metalness: 0.05, map: 'tiles', clip: true },
   /** Intérieur sombre (soute, ouvertures). */
   cavity: { color: '#0d0f12', roughness: 0.9, metalness: 0.2 },
+  /** Orifices sombres percés dans la coque (coupés avec elle en vue en coupe). */
+  hole: { color: '#0d0f12', roughness: 0.9, metalness: 0.2, clip: true },
+  /** Raccords, vis et conduites posés sur la coque. */
+  fitting: { color: '#a7adb3', roughness: 0.28, metalness: 0.95, clip: true },
   /** Tuyères et chambres de combustion. */
   nozzle: { color: '#5d636b', roughness: 0.38, metalness: 0.85 },
   /** Tuyères Raptor Vacuum, plus sombres. */

@@ -6,6 +6,7 @@ import { useMaterials } from '../materials';
 import { TankSection } from '../primitives/TankSection';
 import { Frost } from '../primitives/Frost';
 import { STEEL_TILE, scaleUv } from '../textures';
+import { BoosterDetails } from './BoosterDetails';
 
 const { base, top } = LAYOUT.booster;
 const H = top - base;
@@ -44,6 +45,7 @@ export function Booster() {
       <mesh material={m.sooty} position={[RADIUS * 0.74, 3.2, -RADIUS * 0.7]} rotation={[0, -Math.PI / 4, 0]}>
         <boxGeometry args={[0.18, 4.4, 0.12]} />
       </mesh>
+      <BoosterDetails m={m} catchPinY={CATCH_PIN_Y} />
       {/* Points de capture, saisis par les bras de la tour. */}
       {[1, -1].map((side) => (
         <group
@@ -55,7 +57,7 @@ export function Booster() {
           <mesh material={m.sooty}>
             <boxGeometry args={[0.42, 0.22, 0.2]} />
           </mesh>
-          <mesh material={m.plumbing} position={[0, -0.14, 0]}>
+          <mesh material={m.fitting} position={[0, -0.14, 0]}>
             <boxGeometry args={[0.3, 0.08, 0.26]} />
           </mesh>
         </group>
