@@ -1717,9 +1717,23 @@ body {
 }
 
 @media (max-width: 720px) {
+  .deploy__flights {
+    flex-wrap: nowrap;
+  }
+
   .deploy__flight {
+    flex: 1 1 0;
     min-width: 0;
-    padding: 0.45rem 0.6rem;
+    padding: 0.45rem 0.35rem;
+    text-align: center;
+  }
+
+  .deploy__flight-count {
+    display: none;
+  }
+
+  .deploy__card {
+    padding: 0.7rem 0.85rem;
   }
 
   .deploy__note {
