@@ -158,6 +158,9 @@ test.describe('Page Starship', () => {
     await scrollToSection(page, last.id);
     const end = page.locator(`section#${last.id}`);
     await expect(end.getByRole('link', { name: 'Découvrir Falcon 9' })).toHaveAttribute('href', './');
+    // Arrivé en haut de la dernière étape, les deux boutons tiennent entièrement dans l'écran.
+    const bottom = await end.locator('.panel__actions').evaluate((el) => el.getBoundingClientRect().bottom - window.innerHeight);
+    expect(bottom).toBeLessThanOrEqual(0);
     await end.getByRole('button', { name: 'Revenir au début' }).click();
     await expect(activeSection(page)).toHaveAttribute('id', SECTIONS[0]!.id);
   });

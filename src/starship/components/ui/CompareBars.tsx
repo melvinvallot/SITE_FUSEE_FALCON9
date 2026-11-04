@@ -13,7 +13,7 @@ const fmt = (v: number, unit: string) => `${formatNumber(v, Number.isInteger(v) 
 /** Comparaison chiffrée sous forme de barres proportionnelles, qui se remplissent à l'apparition. */
 export function CompareBars({ rows, primaryLabel = 'Starship', againstLabel = 'Falcon 9' }: CompareBarsProps) {
   return (
-    <div className="compare">
+    <div className={rows.length > 2 ? 'compare compare--grid' : 'compare'}>
       <p className="compare__legend" aria-hidden="true">
         <span className="compare__key compare__key--hot">{primaryLabel}</span>
         <span className="compare__key">{againstLabel}</span>

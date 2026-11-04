@@ -552,6 +552,35 @@ body {
   transform: scaleX(1);
 }
 
+/* Comparaison complète (dernière étape) : deux colonnes, pour que les boutons restent dans l'écran. */
+.section__body:has(.compare--grid) {
+  max-width: 38rem;
+}
+
+.compare--grid .compare__rows {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.5rem;
+}
+
+.section__body:has(.compare--grid) .fineprint {
+  margin-top: 1.25rem;
+}
+
+@media (max-height: 900px) and (min-width: 761px) {
+  .section__body:has(.compare--grid) .panel__title {
+    font-size: clamp(2.2rem, 7vh, 3.6rem);
+    margin-bottom: 0.9rem;
+  }
+
+  .section__body:has(.compare--grid) .panel__lead {
+    margin-bottom: 1.1rem;
+  }
+
+  .section__body:has(.compare--grid) .compare {
+    margin-bottom: 1.25rem;
+  }
+}
+
 /* ---------- Boutons ---------- */
 .button {
   display: inline-flex;

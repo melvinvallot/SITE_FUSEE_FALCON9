@@ -13,6 +13,8 @@ const SIZE = 1800;
 const ROCKS = 220;
 const PUFFS = 160;
 const dummy = new Object3D();
+/** Orientation du vaisseau posé : la limite entre bouclier thermique et acier face à la caméra. */
+const SHIP_YAW = 2.1;
 
 /** Soleil rasant du pôle Sud lunaire : longues zones d'ombre dans les cratères. */
 export const MOON_SUN = new Vector3(0.78, 0.3, 0.42).normalize();
@@ -28,9 +30,8 @@ export function MoonWorld({ reducedMotion = false }: { reducedMotion?: boolean }
   const root = useRef<Group>(null);
   const ship = useRef<Group>(null);
   const rocks = useRef<InstancedMesh>(null);
-  const live = useRef({ main: 0, thrusters: 0 });
+  const live = useRef({ main: 0 });
   const main = useMemo(() => () => live.current.main, []);
-  const thrusters = useMemo(() => () => live.current.thrusters, []);
 
   const { ground, material, rockMaterial, dustMaterial, dust } = useMemo(() => {
     const ground = new PlaneGeometry(SIZE, SIZE, 260, 260);
@@ -109,7 +110,6 @@ export function MoonWorld({ reducedMotion = false }: { reducedMotion?: boolean }
     if (!visible) return;
     const pose = landing(s.land);
     live.current.main = pose.main;
-    live.current.thrusters = pose.thrusters;
     const g = ship.current;
     if (g) {
       g.position.set(pose.x, pose.y + 0.12, 0);
@@ -140,9 +140,9 @@ export function MoonWorld({ reducedMotion = false }: { reducedMotion?: boolean }
       </group>
       {/* Vaisseau lunaire : pivot à la base des moteurs, couché pendant le freinage (nez vers -x). */}
       <group ref={ship}>
-        {/* Côté acier vers la caméra. */}
-        <group rotation={[0, Math.PI * 0.85, 0]}>
-          <ShipModel legs lunar thrust={main} thrusters={thrusters} />
+        {/* Le vrai Starship de la page, tourné pour montrer à la fois les tuiles noires, l'acier et les volets. */}
+        <group rotation={[0, SHIP_YAW, 0]}>
+          <ShipModel legs thrust={main} />
         </group>
       </group>
     </group>
