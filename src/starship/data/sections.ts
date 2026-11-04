@@ -292,7 +292,7 @@ export const SECTIONS: readonly PageSection[] = [
     align: 'end',
     points: [
       'Les ravitailleurs se posent et repartent : le coût principal devient celui des ergols, très faible.',
-      'Le transfert se fait vaisseau contre vaisseau, arrimés par l’arrière.',
+      'Les deux vaisseaux s’arriment côte à côte, flanc contre flanc, et les ergols passent de l’un à l’autre par des raccords près des moteurs.',
     ],
   },
   {
