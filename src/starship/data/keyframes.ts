@@ -53,7 +53,8 @@ export const KEYFRAMES: readonly Keyframe[] = [
   frame('vaisseau', [-17, 33, 36], [6, 30.5, 0], 'ship', exploded),
   frame('nez', [8.5, 39, 13], [-3, 36.2, 0], 'nose', { ...exploded, flaps: 1 }),
   frame('soute', toWorld([-6.5, 33.5, -24]), toWorld([-4.6, 31.6, 0]), 'payload', { ...exploded, door: 1, fov: 34 }),
-  frame('bouclier', toWorld([44, 26, 11]), toWorld([0, 30, 11]), 'heatShield', { ...exploded, pitch: 1, plasma: 1, fov: 34 }),
+  // Vaisseau assemblé et seul (le propulseur est masqué), couché comme pendant la rentrée.
+  frame('bouclier', toWorld([44, 20.5, 11]), toWorld([0, 24.5, 11]), 'heatShield', { pitch: 1, plasma: 1, fov: 34 }),
   frame('reservoirs', [-13, 30, 23], [4.4, 28.5, 0], 'shipTanks', { ...exploded, cutaway: 1 }),
   frame('moteurs-vaisseau', [6, 17.8, 7.5], [-1.8, 21.6, 0], 'shipEngines', exploded),
 

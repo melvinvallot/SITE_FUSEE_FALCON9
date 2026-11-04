@@ -30,6 +30,8 @@ export function Starship({ reducedMotion = false }: { reducedMotion?: boolean })
     if (root.current) root.current.visible = s.env < 0.5;
     const b = booster.current;
     if (b) {
+      // Vaisseau couché pour la rentrée (fiche « bouclier thermique ») : il est seul, sans propulseur.
+      b.visible = s.pitch < 0.5;
       const pose = boosterPose(s.launch, s.sep, s.capture);
       // Repère local tourné de STACK_YAW : z local = x écran, la bascule se fait dans le plan de l'écran.
       b.position.set(0, pose.y, pose.x);
