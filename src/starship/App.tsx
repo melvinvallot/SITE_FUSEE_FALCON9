@@ -23,6 +23,8 @@ import { AtmosphereScale } from './components/ui/AtmosphereScale';
 import { DirectorOverlay } from './components/ui/DirectorOverlay';
 import { useDirectorControls } from './hooks/useDirectorControls';
 import { startLaunch } from './lib/director';
+import { DeployPicker } from './components/ui/DeployPicker';
+import { DEPLOYMENTS } from './data/deployments';
 
 const Scene = lazy(() => import('./components/three/Scene').then((m) => ({ default: m.Scene })));
 
@@ -98,6 +100,7 @@ export default function App() {
                       <Button onClick={() => startLaunch(true)}>Lancer le compte à rebours</Button>
                     </div>
                   )}
+                  {section.id === 'deploiements' && <DeployPicker deployments={DEPLOYMENTS} active={isActive} />}
                   {isLast && (
                     <>
                       <div className="panel__actions">
@@ -111,7 +114,7 @@ export default function App() {
                       <p className="fineprint">
                         Chiffres issus de la page Starship de SpaceX (spacex.com/vehicles/starship). Les repères de vol
                         sont approximatifs ; la charge de Falcon 9 est celle de la version non récupérée. Modèle 3D
-                        simplifié, réalisé à des fins pédagogiques. Cartes de la Terre : Solar System Scope (CC BY 4.0), d’après
+                        simplifié, réalisé à des fins pédagogiques. Largages : comptes rendus des vols d’essai 10 à 14 (SpaceX, Wikipédia). Cartes de la Terre : Solar System Scope (CC BY 4.0), d’après
                         la NASA. Ce site n’est pas affilié à SpaceX.
                       </p>
                     </>

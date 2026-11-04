@@ -24,8 +24,9 @@ describe('cohérence des données Starship', () => {
   it('reste dans les bornes de chaque paramètre', () => {
     for (const k of KEYFRAMES) {
       expect(k.env).toBeGreaterThanOrEqual(0);
-      expect(k.env).toBeLessThanOrEqual(2);
-      for (const v of [k.explode, k.cutaway, k.site, k.launch, k.sep, k.capture]) {
+      expect(k.env).toBeLessThanOrEqual(3);
+      expect(Number.isInteger(k.env)).toBe(true);
+      for (const v of [k.explode, k.cutaway, k.site, k.launch, k.sep, k.capture, k.tli, k.land]) {
         expect(v).toBeGreaterThanOrEqual(0);
         expect(v).toBeLessThanOrEqual(1);
       }

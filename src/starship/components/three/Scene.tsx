@@ -11,7 +11,8 @@ import { Lighting } from './Lighting';
 import { TimelineDriver } from './SceneStateContext';
 import { Starship } from './Starship';
 import { LaunchSite } from './site/LaunchSite';
-import { MarsWorld } from './worlds/MarsWorld';
+import { DepartureWorld } from './worlds/DepartureWorld';
+import { MoonWorld } from './worlds/MoonWorld';
 import { OrbitWorld } from './worlds/OrbitWorld';
 import { Sky } from './worlds/Sky';
 import { SanitizePass } from './SanitizePass';
@@ -68,7 +69,8 @@ export function Scene({ keyframes, progress, reducedMotion = false, onReady }: S
           <ExhaustTrail />
           <CloudDeck />
           <OrbitWorld />
-          <MarsWorld />
+          <DepartureWorld reducedMotion={reducedMotion} />
+          <MoonWorld reducedMotion={reducedMotion} />
         </TimelineDriver>
         {EFFECTS && (
           <EffectComposer multisampling={LOW_POWER ? 0 : 4}>

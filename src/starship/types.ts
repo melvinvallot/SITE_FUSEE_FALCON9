@@ -48,7 +48,14 @@ export const SCALAR_KEYS = [
   'capture',
   /** Ravitaillement en orbite : 0 = vaisseaux éloignés, 1 = arrimés. */
   'refuel',
-  /** Décor : 0 = pas de tir, 1 = orbite terrestre, 2 = surface de Mars. */
+  /** Largages de satellites puis départ vers la Lune : 0 = en orbite basse, 1 = injection translunaire en cours. */
+  'tli',
+  /** Arrivée à la Lune : 0 = en orbite lunaire, 1 = posé sur le sol. */
+  'land',
+  /**
+   * Décor : 0 = pas de tir, 1 = orbite terrestre (ravitaillement),
+   * 2 = orbite terrestre (largages et départ vers la Lune), 3 = la Lune.
+   */
   'env',
   /** Léger balancement automatique de la caméra. */
   'sway',

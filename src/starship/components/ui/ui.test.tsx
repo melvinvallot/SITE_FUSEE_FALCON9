@@ -13,6 +13,9 @@ import { SectionContent } from './SectionContent';
 import { StackGauge } from './StackGauge';
 import { StatCounter } from './StatCounter';
 import { Telemetry } from './Telemetry';
+import { DeployPicker } from './DeployPicker';
+import { DEPLOYMENTS } from '../../data/deployments';
+import { deployStore } from '../../lib/deploy';
 
 const nbsp = (s: string | null) => (s ?? '').replace(/\s/g, ' ');
 
@@ -111,5 +114,32 @@ describe('SiteNav', () => {
     expect(screen.getByRole('link', { name: 'Starship' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Falcon 9' })).toHaveAttribute('href', './');
     expect(screen.getByRole('link', { name: 'Planètes' })).toHaveAttribute('href', './planetes.html');
+  });
+});
+
+describe('DeployPicker', () => {
+  it('propose chaque vol et relance le largage du vol choisi', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<DeployPicker deployments={DEPLOYMENTS} active={false} />);
+    const radios = screen.getAllByRole('radio');
+    expect(radios).toHaveLength(DEPLOYMENTS.length);
+    expect(radios[DEPLOYMENTS.length - 1]).toHaveAttribute('aria-checked', 'true');
+
+    // En arrivant sur la section, le largage démarre.
+    const run = deployStore.get().run;
+    rerender(<DeployPicker deployments={DEPLOYMENTS} active />);
+    expect(deployStore.get().run).toBe(run + 1);
+
+    await user.click(screen.getByRole('radio', { name: /Vol 10/ }));
+    expect(screen.getByRole('radio', { name: /Vol 10/ })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByText('8 simulateurs de satellites Starlink')).toBeInTheDocument();
+
+    // Flèche droite : vol suivant, sans changer d'étape de la page.
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('radio', { name: /Vol 11/ })).toHaveAttribute('aria-checked', 'true');
+
+    const before = deployStore.get().run;
+    await user.click(screen.getByRole('button', { name: 'Rejouer le largage' }));
+    expect(deployStore.get()).toEqual({ index: 1, run: before + 1 });
   });
 });

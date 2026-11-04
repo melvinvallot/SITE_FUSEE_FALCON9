@@ -1,4 +1,5 @@
 import { BoxGeometry, CylinderGeometry } from 'three';
+import { useShipVariant } from '../ShipVariant';
 import { LAYOUT, RADIUS, STACK_YAW } from '../../../data/layout';
 import { FINE, Kit, towerAngle, useKits } from '../detail';
 import type { MaterialSet } from '../materials';
@@ -49,6 +50,7 @@ export function qdPlate(sooty: Kit, cavity: Kit, plumbing: Kit, a: number, y: nu
  * secondaire, jupe arrière raidie, propulseurs d'attitude et plaque de raccordement.
  */
 export function ShipDetails({ m }: { m: MaterialSet }) {
+  const variant = useShipVariant();
   const g = useKits(() => {
     const steel = new Kit();
     const sooty = new Kit();
@@ -118,7 +120,7 @@ export function ShipDetails({ m }: { m: MaterialSet }) {
     <group>
       <mesh geometry={g.steel} material={m.steel} />
       <mesh geometry={g.sooty} material={m.sooty} />
-      <mesh geometry={g.tiles} material={m.tiles} />
+      {variant.shield && <mesh geometry={g.tiles} material={m.tiles} />}
       <mesh geometry={g.cavity} material={m.hole} />
       <mesh geometry={g.plumbing} material={m.fitting} />
     </group>

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { launchLift } from '../../lib/flight';
+import { shipFollow } from '../../lib/moon';
 import { useSceneState } from './SceneStateContext';
 import { framingFor, lateralScale } from '../../../lib/device';
 
@@ -27,8 +28,10 @@ export function CameraRig({ parallax = 0.5, reducedMotion = false }: CameraRigPr
     const narrow = framingFor(aspect) === 'portrait';
     const anchor = launchLift(s.launch) * (1 - s.capture);
 
-    v.target.set(s.cameraTarget[0] * (narrow ? 0.1 : lateralScale(aspect)), s.cameraTarget[1] + anchor, s.cameraTarget[2]);
-    v.pos.set(s.cameraPosition[0], s.cameraPosition[1] + anchor, s.cameraPosition[2]);
+    // Voyage vers la Lune : la caméra accompagne le vaisseau (départ, puis descente).
+    const [fx, fy] = shipFollow(s.env, s.tli, s.land);
+    v.target.set(s.cameraTarget[0] * (narrow ? 0.1 : lateralScale(aspect)) + fx, s.cameraTarget[1] + anchor + fy, s.cameraTarget[2]);
+    v.pos.set(s.cameraPosition[0] + fx, s.cameraPosition[1] + anchor + fy, s.cameraPosition[2]);
 
     // Balancement lent autour de la cible.
     if (!reducedMotion && s.sway > 0) {
