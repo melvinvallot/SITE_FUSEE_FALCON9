@@ -40,6 +40,13 @@ const moonFragment = /* glsl */ `
   }
 `;
 
+/**
+ * Soleil pour la Terre : juste sous l'horizon, côté droit. Les vaisseaux, en
+ * altitude, sont encore au soleil, mais le sol sous eux est déjà dans la nuit,
+ * avec les lumières des villes ; l'aube se lève sur le limbe à droite.
+ */
+export const EARTH_SUN = new Vector3(0.6, -0.1, 0.8).normalize();
+
 const EARTH_RADIUS = 600;
 const EARTH_CENTER: [number, number, number] = [0, -640, -120];
 const ORBIT_Y = 14;
@@ -101,7 +108,7 @@ export function OrbitWorld() {
   return (
     <group ref={root}>
       <group position={EARTH_CENTER}>
-        <Earth radius={EARTH_RADIUS} sun={SUN_DIRECTION} latitude={OVERFLIGHT.latitude} longitude={OVERFLIGHT.longitude} up={UNDER_SHIPS} />
+        <Earth radius={EARTH_RADIUS} sun={EARTH_SUN} latitude={OVERFLIGHT.latitude} longitude={OVERFLIGHT.longitude} up={UNDER_SHIPS} />
       </group>
       {/* La Lune, loin derrière les vaisseaux (taille apparente exagérée). */}
       <mesh material={moon} position={[260, 70, -760]}>
@@ -136,4 +143,3 @@ export function OrbitWorld() {
     </group>
   );
 }
-
